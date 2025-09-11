@@ -250,12 +250,13 @@ st.header(f"Topik: {selected_topic}")
 # We'll use key 'global-webrtc' and create it in the sidebar area for compactness.
 st.sidebar.markdown("---")
 st.sidebar.markdown("**STT (microphone)**")
-webrtc_ctx = webrtc_streamer(
+wwebrtc_ctx = webrtc_streamer(
     key="speech-to-text",
     mode=WebRtcMode.SENDRECV,
-    audio_receiver_size=256,
+    audio_processor_factory=RecorderProcessor,   # ⬅️ ini penting
     media_stream_constraints={"audio": True, "video": False},
 )
+
 
 # Render vocabulary rows
 vocabularies = vocab_data.get(selected_topic, [])
