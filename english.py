@@ -45,7 +45,7 @@ import contextlib
 import wave
 import base64
 
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, ClientSettings, AudioProcessorBase
+from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
 import speech_recognition as sr
 
 # ----------------- CONFIG -----------------
@@ -251,14 +251,10 @@ st.header(f"Topik: {selected_topic}")
 st.sidebar.markdown("---")
 st.sidebar.markdown("**STT (microphone)**")
 webrtc_ctx = webrtc_streamer(
-    key="global-webrtc",
-    mode=WebRtcMode.SENDONLY,
-    audio_processor_factory=RecorderProcessor,
+    key="speech-to-text",
+    mode=WebRtcMode.SENDRECV,
+    audio_receiver_size=256,
     media_stream_constraints={"audio": True, "video": False},
-    async_processing=True,
-    client_settings=ClientSettings(
-        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-    )
 )
 
 # Render vocabulary rows
