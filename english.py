@@ -252,11 +252,11 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("**STT (microphone)**")
 
 
-webrtc_ctx = None
 webrtc_ctx = webrtc_streamer(
     key="speech-to-text",
     mode=WebRtcMode.SENDRECV,
-    audio_processor_factory=RecorderProcessor,   # ⬅️ ini penting
+    audio_processor_factory=RecorderProcessor,  # ⬅️ ini penting
+    audio_receiver_size=256,
     media_stream_constraints={"audio": True, "video": False},
 )
 
