@@ -10,7 +10,6 @@ Original file is located at
 import streamlit as st
 import gtts
 from gtts import gTTS
-import speech_recognition as sr
 import os
 
 # Tentukan direktori untuk menyimpan file audio sementara
@@ -27,25 +26,7 @@ def text_to_speech(text):
         tts.write_to_fp(f)
     return f"{TEMP_AUDIO_DIR}/temp.mp3"
 
-def speech_to_text():
-    """Merekam suara dari mikrofon dan mengubahnya menjadi teks."""
-    r = sr.Recognizer()
-    with sr.Microphone() as source:
-        st.info("Sedang mendengarkan... Mohon ucapkan kata tersebut.")
-        audio = r.listen(source)
-
-    try:
-        st.info("Mengenali ucapan...")
-        text = r.recognize_google(audio, language="en-US")
-        return text
-    except sr.UnknownValueError:
-        st.error("❌ Maaf, tidak dapat memahami ucapan Anda.")
-        return None
-    except sr.RequestError as e:
-        st.error(f"❌ Maaf, terjadi kesalahan layanan; {e}")
-        return None
-
-# --- DATA KOSAKATA (Sama seperti sebelumnya) ---
+# --- DATA KOSAKATA ---
 
 vocab_data = {
     "Hewan": [
@@ -178,12 +159,12 @@ st.markdown("""
         background-color: #f0f2f6;
         color: #0d47a1;
     }
-
+    
     /* Warna teks di sidebar */
     .st-emotion-cache-vk3ypu.e1ds3rsq3 {
         color: #0d47a1;
     }
-
+    
     /* Warna background utama */
     .st-emotion-cache-1cypj85.e1ds3rsq0 {
         background-color: #ffffff;
@@ -208,7 +189,7 @@ st.markdown("""
     .st-emotion-cache-14u43f8.e1ds3rsq1:hover {
         background-color: #2196f3;
     }
-
+    
     /* Button untuk TTS & STT */
     .stButton > button {
         background-color: #1e88e5; /* Biru terang */
@@ -232,15 +213,16 @@ def main():
     st.title("📚 Kamus Kosakata Inggris-Indonesia")
     st.markdown("""
     <p style="color:#666666;">
-    Pilih topik di sidebar untuk melihat daftar kosakata. Klik tombol <span style="color:#1e88e5;">🔊</span> untuk mendengarkan pengucapan dan <span style="color:#1e88e5;">🎙️</span> untuk mengecek pelafalan Anda.
+    Pilih topik di sidebar untuk melihat daftar kosakata. Klik tombol <span style="color:#1e88e5;">🔊</span> untuk mendengarkan pengucapan.
     </p>
     """, unsafe_allow_html=True)
+    st.markdown("⚠️ **Catatan**: Fitur Speech-to-Text (🎙️) tidak dapat berfungsi di platform ini karena masalah kompatibilitas library.")
 
     st.write("---")
 
     # Sidebar untuk memilih topik dan tema
     st.sidebar.title("Pengaturan")
-
+    
     # Fitur untuk mengubah tema
     theme_option = st.sidebar.radio(
         "Pilih Tema Latar Belakang",
@@ -251,29 +233,30 @@ def main():
         st.session_state['theme'] = 'light'
     else:
         st.session_state['theme'] = 'dark'
-
+        
     st.sidebar.markdown("---")
-
+    
     st.sidebar.title("Pilih Topik")
     topic_list = list(vocab_data.keys())
     selected_topic = st.sidebar.radio("Daftar Topik", topic_list)
-
+    
     st.header(f"Topik: {selected_topic}")
-
+    
     vocabularies = vocab_data.get(selected_topic, [])
-
+    
     for i, vocab in enumerate(vocabularies):
         word = vocab['kata']
         translation = vocab['terjemahan']
         pronunciation = vocab['pelafalan']
-
-        col1, col2, col3, col4 = st.columns([0.4, 0.4, 0.1, 0.1])
-
+        
+        # Mengubah tata letak karena tidak ada tombol STT lagi
+        col1, col2, col3 = st.columns([0.4, 0.4, 0.2])
+        
         with col1:
             st.markdown(f"**{word}**")
         with col2:
             st.markdown(f"*{translation}* ({pronunciation})")
-
+            
         with col3:
             # Tombol TTS untuk memutar audio
             if st.button("🔊", key=f"tts_{word}_{i}"):
@@ -283,26 +266,6 @@ def main():
                     st.audio(audio_bytes, format='audio/mp3', start_time=0)
                 # Hapus file audio setelah digunakan
                 os.remove(audio_file_path)
-
-        with col4:
-            # Tombol STT untuk merekam dan memeriksa
-            st.session_state.setdefault(f'stt_result_{word}_{i}', None)
-            if st.button("🎙️", key=f"stt_{word}_{i}"):
-                recognized_text = speech_to_text()
-
-                if recognized_text:
-                    if recognized_text.lower() == word.lower():
-                        st.session_state[f'stt_result_{word}_{i}'] = True
-                        st.success("✅ Benar!")
-                    else:
-                        st.session_state[f'stt_result_{word}_{i}'] = False
-                        st.error(f"❌ Salah. Anda mengucapkan: '{recognized_text}'")
-
-                # Menampilkan status ceklis
-            if st.session_state.get(f'stt_result_{word}_{i}'):
-                st.markdown("✅", help="Pelafalan Anda benar!")
-            elif st.session_state.get(f'stt_result_{word}_{i}') is False:
-                st.markdown("❌", help="Pelafalan Anda salah.")
 
 if __name__ == "__main__":
     main()
