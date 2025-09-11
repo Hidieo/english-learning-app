@@ -1,5 +1,7 @@
 streamlit
+streamlit-webrtc==0.50.0
 gtts
-SpeechRecognition
-streamlit-webrtc
-gtts
+speechrecognition
+av
+numpy
+pydub
