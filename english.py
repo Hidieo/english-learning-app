@@ -250,6 +250,9 @@ st.header(f"Topik: {selected_topic}")
 # We'll use key 'global-webrtc' and create it in the sidebar area for compactness.
 st.sidebar.markdown("---")
 st.sidebar.markdown("**STT (microphone)**")
+
+
+webrtc_ctx = None
 wwebrtc_ctx = webrtc_streamer(
     key="speech-to-text",
     mode=WebRtcMode.SENDRECV,
