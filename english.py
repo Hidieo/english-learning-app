@@ -637,6 +637,13 @@ for vocab in vocab_list:
             speechSynthesis.speak(utterance);
         }}
 
+        function normalize(text) {{
+            return text.toLowerCase()
+                       .replace(/’/g, "'")
+                       .replace(/[^a-zA-Z\s]/g, "")
+                       .trim();
+        }}
+
         // STT
         function startRecognition(targetWord) {{
             var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -647,7 +654,10 @@ for vocab in vocab_list:
                 var transcript = event.results[0][0].transcript.toLowerCase();
                 var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_"));
 
-                if (transcript.includes(targetWord.toLowerCase())) {{
+                var normalizedTranscript = normalize(transcript);
+                var normalizedTarget = normalize(targetWord);
+                
+                if (normalizedTranscript.includes(normalizedTarget)) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
                 }} else {{
