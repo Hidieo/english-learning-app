@@ -159,7 +159,7 @@ webrtc_ctx = webrtc_streamer(
     },
     async_processing=True,
     audio_receiver_size=256,
-    auto_play_audio=True,
+    auto_play_audio=True
 )
 
 # Show the webrtc status / small hint
