@@ -1,18 +1,12 @@
-"""
-Full Streamlit app: Kamus Kosakata Inggris-Indonesia (Stable WebRTC + retries + waveform live)
+# -*- coding: utf-8 -*-
+"""Kamus Kosakata Interaktif v2.0 - Stable WebRTC
 
-Requirements:
-    streamlit
-    streamlit-webrtc==0.50.0
-    gtts
-    speechrecognition
-    av
-    numpy
-    pydub
-    matplotlib
+This script implements a full Streamlit application for an interactive English-Indonesian
+vocabulary dictionary with stable WebRTC-based Speech-to-Text (STT) functionality.
 """
 
 import streamlit as st
+import gtts
 from gtts import gTTS
 import os
 import threading
@@ -22,17 +16,76 @@ import io
 import wave
 import time
 import speech_recognition as sr
-import matplotlib.pyplot as plt
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
 
-# ----------------- CONFIG -----------------
+# --- KONFIGURASI APLIKASI ---
 TEMP_AUDIO_DIR = "temp_audio"
 if not os.path.exists(TEMP_AUDIO_DIR):
     os.makedirs(TEMP_AUDIO_DIR)
 
-st.set_page_config(page_title="Kamus Kosakata Interaktif", page_icon="📚", layout="wide")
+st.set_page_config(
+    page_title="Kamus Kosakata Interaktif",
+    page_icon="📚",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# ----------------- DATA -----------------
+# Kustomisasi CSS untuk perpaduan biru dan putih
+st.markdown("""
+<style>
+    /* Mengubah warna sidebar */
+    .st-emotion-cache-121bd7t.e1ds3rsq1 {
+        background-color: #f0f2f6;
+        color: #0d47a1;
+    }
+    
+    /* Warna teks di sidebar */
+    .st-emotion-cache-vk3ypu.e1ds3rsq3 {
+        color: #0d47a1;
+    }
+    
+    /* Warna background utama */
+    .st-emotion-cache-1cypj85.e1ds3rsq0 {
+        background-color: #ffffff;
+    }
+    
+    /* Kustomisasi button */
+    .st-emotion-cache-6q9sum.e1ds3rsq1 {
+        background-color: #0d47a1;
+        color: white;
+        border-radius: 8px;
+        border: 1px solid #0d47a1;
+    }
+    .st-emotion-cache-6q9sum.e1ds3rsq1:hover {
+        background-color: #1976d2;
+    }
+    .st-emotion-cache-14u43f8.e1ds3rsq1 {
+        background-color: #1e88e5;
+        color: white;
+        border-radius: 8px;
+        border: 1px solid #1e88e5;
+    }
+    .st-emotion-cache-14u43f8.e1ds3rsq1:hover {
+        background-color: #2196f3;
+    }
+    
+    /* Button untuk TTS & STT */
+    .stButton > button {
+        background-color: #1e88e5; /* Biru terang */
+        color: white;
+        border-radius: 5px;
+        border: none;
+        padding: 8px 12px;
+        font-weight: bold;
+    }
+    .stButton > button:hover {
+        background-color: #2196f3; /* Biru yang lebih terang saat hover */
+    }
+
+</style>
+""", unsafe_allow_html=True)
+
+# --- DATA KOSAKATA ---
 vocab_data = {
     "Hewan": [
         {'kata': 'Cat', 'terjemahan': 'Kucing', 'pelafalan': '(ket)'},
@@ -46,11 +99,109 @@ vocab_data = {
         {'kata': 'Apple', 'terjemahan': 'Apel', 'pelafalan': '(epel)'},
         {'kata': 'Banana', 'terjemahan': 'Pisang', 'pelafalan': '(bænana)'},
         {'kata': 'Orange', 'terjemahan': 'Jeruk', 'pelafalan': '(orej)'},
+        {'kata': 'Grape', 'terjemahan': 'Anggur', 'pelafalan': '(grep)'},
+        {'kata': 'Mango', 'terjemahan': 'Mangga', 'pelafalan': '(menggo)'}
     ],
+    "Warna": [
+        {'kata': 'Red', 'terjemahan': 'Merah', 'pelafalan': '(red)'},
+        {'kata': 'Blue', 'terjemahan': 'Biru', 'pelafalan': '(blu)'},
+        {'kata': 'Green', 'terjemahan': 'Hijau', 'pelafalan': '(grin)'},
+        {'kata': 'Yellow', 'terjemahan': 'Kuning', 'pelafalan': '(yelo)'},
+        {'kata': 'Black', 'terjemahan': 'Hitam', 'pelafalan': '(blek)'}
+    ],
+    "Angka": [
+        {'kata': 'One', 'terjemahan': 'Satu', 'pelafalan': '(wan)'},
+        {'kata': 'Two', 'terjemahan': 'Dua', 'pelafalan': '(tu)'},
+        {'kata': 'Three', 'terjemahan': 'Tiga', 'pelafalan': '(tri)'},
+        {'kata': 'Four', 'terjemahan': 'Empat', 'pelafalan': '(for)'},
+        {'kata': 'Five', 'terjemahan': 'Lima', 'pelafalan': '(faiv)'}
+    ],
+    "Bagian Tubuh": [
+        {'kata': 'Head', 'terjemahan': 'Kepala', 'pelafalan': '(hed)'},
+        {'kata': 'Hand', 'terjemahan': 'Tangan', 'pelafalan': '(hend)'},
+        {'kata': 'Foot', 'terjemahan': 'Kaki', 'pelafalan': '(fut)'},
+        {'kata': 'Eye', 'terjemahan': 'Mata', 'pelafalan': '(ai)'},
+        {'kata': 'Ear', 'terjemahan': 'Telinga', 'pelafalan': '(ir)'}
+    ],
+    "Transportasi": [
+        {'kata': 'Car', 'terjemahan': 'Mobil', 'pelafalan': '(kar)'},
+        {'kata': 'Bus', 'terjemahan': 'Bus', 'pelafalan': '(bas)'},
+        {'kata': 'Train', 'terjemahan': 'Kereta', 'pelafalan': '(tren)'},
+        {'kata': 'Bicycle', 'terjemahan': 'Sepeda', 'pelafalan': '(baisikel)'},
+        {'kata': 'Airplane', 'terjemahan': 'Pesawat', 'pelafalan': '(erplen)'}
+    ],
+    "Pakaian": [
+        {'kata': 'Shirt', 'terjemahan': 'Kemeja', 'pelafalan': '(syert)'},
+        {'kata': 'Pants', 'terjemahan': 'Celana', 'pelafalan': '(pents)'},
+        {'kata': 'Dress', 'terjemahan': 'Gaun', 'pelafalan': '(dres)'},
+        {'kata': 'Shoes', 'terjemahan': 'Sepatu', 'pelafalan': '(syus)'},
+        {'kata': 'Hat', 'terjemahan': 'Topi', 'pelafalan': '(het)'}
+    ],
+    "Makanan": [
+        {'kata': 'Bread', 'terjemahan': 'Roti', 'pelafalan': '(bred)'},
+        {'kata': 'Rice', 'terjemahan': 'Nasi', 'pelafalan': '(rais)'},
+        {'kata': 'Soup', 'terjemahan': 'Sup', 'pelafalan': '(sup)'},
+        {'kata': 'Salad', 'terjemahan': 'Salad', 'pelafalan': '(seled)'},
+        {'kata': 'Egg', 'terjemahan': 'Telur', 'pelafalan': '(eg)'}
+    ],
+    "Minuman": [
+        {'kata': 'Water', 'terjemahan': 'Air', 'pelafalan': '(woter)'},
+        {'kata': 'Milk', 'terjemahan': 'Susu', 'pelafalan': '(miluk)'},
+        {'kata': 'Tea', 'terjemahan': 'Teh', 'pelafalan': '(ti)'},
+        {'kata': 'Coffee', 'terjemahan': 'Kopi', 'pelafalan': '(kofi)'},
+        {'kata': 'Juice', 'terjemahan': 'Jus', 'pelafalan': '(jus)'}
+    ],
+    "Profesi": [
+        {'kata': 'Teacher', 'terjemahan': 'Guru', 'pelafalan': '(ticer)'},
+        {'kata': 'Doctor', 'terjemahan': 'Dokter', 'pelafalan': '(doktor)'},
+        {'kata': 'Engineer', 'terjemahan': 'Insinyur', 'pelafalan': '(enjinir)'},
+        {'kata': 'Artist', 'terjemahan': 'Seniman', 'pelafalan': '(artis)'},
+        {'kata': 'Chef', 'terjemahan': 'Koki', 'pelafalan': '(syef)'}
+    ],
+    "Negara": [
+        {'kata': 'Indonesia', 'terjemahan': 'Indonesia', 'pelafalan': '(indonesia)'},
+        {'kata': 'Japan', 'terjemahan': 'Jepang', 'pelafalan': '(jepen)'},
+        {'kata': 'China', 'terjemahan': 'Tiongkok', 'pelafalan': '(caina)'},
+        {'kata': 'USA', 'terjemahan': 'Amerika', 'pelafalan': '(yu es ei)'},
+        {'kata': 'Germany', 'terjemahan': 'Jerman', 'pelafalan': '(jermani)'}
+    ],
+    "Olahraga": [
+        {'kata': 'Football', 'terjemahan': 'Sepak bola', 'pelafalan': '(futbol)'},
+        {'kata': 'Basketball', 'terjemahan': 'Bola basket', 'pelafalan': '(basketbol)'},
+        {'kata': 'Swimming', 'terjemahan': 'Renang', 'pelafalan': '(swiming)'},
+        {'kata': 'Tennis', 'terjemahan': 'Tenis', 'pelafalan': '(tenis)'},
+        {'kata': 'Cycling', 'terjemahan': 'Bersepeda', 'pelafalan': '(saikling)'}
+    ],
+    "Keluarga": [
+        {'kata': 'Father', 'terjemahan': 'Ayah', 'pelafalan': '(fader)'},
+        {'kata': 'Mother', 'terjemahan': 'Ibu', 'pelafalan': '(mader)'},
+        {'kata': 'Brother', 'terjemahan': 'Kakak/Adik Laki-laki', 'pelafalan': '(brader)'},
+        {'kata': 'Sister', 'terjemahan': 'Kakak/Adik Perempuan', 'pelafalan': '(sister)'},
+        {'kata': 'Grandmother', 'terjemahan': 'Nenek', 'pelafalan': '(grendmader)'}
+    ],
+    "Musim": [
+        {'kata': 'Summer', 'terjemahan': 'Musim panas', 'pelafalan': '(samer)'},
+        {'kata': 'Winter', 'terjemahan': 'Musim dingin', 'pelafalan': '(winter)'},
+        {'kata': 'Spring', 'terjemahan': 'Musim semi', 'pelafalan': '(spring)'},
+        {'kata': 'Autumn', 'terjemahan': 'Musim gugur', 'pelafalan': '(otem)'}
+    ],
+    "Cuaca": [
+        {'kata': 'Sunny', 'terjemahan': 'Cerah', 'pelafalan': '(sani)'},
+        {'kata': 'Cloudy', 'terjemahan': 'Berawan', 'pelafalan': '(klaudi)'},
+        {'kata': 'Rainy', 'terjemahan': 'Hujan', 'pelafalan': '(reni)'},
+        {'kata': 'Windy', 'terjemahan': 'Berangin', 'pelafalan': '(windi)'}
+    ],
+    "Perasaan": [
+        {'kata': 'Happy', 'terjemahan': 'Senang', 'pelafalan': '(hepi)'},
+        {'kata': 'Sad', 'terjemahan': 'Sedih', 'pelafalan': '(sed)'},
+        {'kata': 'Angry', 'terjemahan': 'Marah', 'pelafalan': '(enggri)'},
+        {'kata': 'Scared', 'terjemahan': 'Takut', 'pelafalan': '(skerd)'}
+    ]
 }
 
-# ----------------- HELPERS -----------------
+# --- FUNGSI-FUNGSI UTAMA ---
 def text_to_speech(text: str) -> str:
+    """Mengubah teks menjadi file audio MP3."""
     safe_name = text.replace(' ', '_')
     out_path = os.path.join(TEMP_AUDIO_DIR, f"{safe_name}.mp3")
     if not os.path.exists(out_path):
@@ -58,17 +209,12 @@ def text_to_speech(text: str) -> str:
         tts.save(out_path)
     return out_path
 
-
 def frames_to_wav_bytes(frames):
+    """Mengubah frames audio dari WebRTC menjadi format WAV bytes."""
     if not frames:
         return None
     sample_rate = frames[0].sample_rate
-    pcm_arrays = []
-    for frame in frames:
-        arr = frame.to_ndarray()
-        if arr.ndim == 2:
-            arr = arr.mean(axis=0)
-        pcm_arrays.append(arr)
+    pcm_arrays = [frame.to_ndarray().mean(axis=0) if frame.to_ndarray().ndim == 2 else frame.to_ndarray() for frame in frames]
     concat = np.concatenate(pcm_arrays).astype(np.int16)
     buf = io.BytesIO()
     with wave.open(buf, 'wb') as wf:
@@ -79,28 +225,29 @@ def frames_to_wav_bytes(frames):
     buf.seek(0)
     return buf.read()
 
+def normalize_text(s: str) -> str:
+    """Menghilangkan karakter non-alfanumerik untuk perbandingan."""
+    return ''.join(ch for ch in s.lower() if ch.isalnum() or ch.isspace()).strip()
 
-# ----------------- AUDIO PROCESSOR -----------------
+# --- AUDIO PROCESSOR UNTUK STREAMLIT-WEBRTC ---
 class RecorderProcessor(AudioProcessorBase):
     def __init__(self):
         self._frames = []
         self._lock = threading.Lock()
-        self.waveform = np.zeros(100)
+        self.last_audio_time = time.time()
 
     def recv_audio(self, frame: av.AudioFrame) -> av.AudioFrame:
         arr = frame.to_ndarray()
         if arr.ndim == 2:
             arr = arr[:, 0]
-
-        # update waveform (last 100 samples RMS-based)
-        rms = np.sqrt(np.mean(arr.astype(np.float32) ** 2))
-        self.waveform = np.roll(self.waveform, -1)
-        self.waveform[-1] = rms
-
+        
         with self._lock:
             self._frames.append(frame)
-            if len(self._frames) > 250:
+            # Batasi buffer ke 3-4 detik
+            if len(self._frames) > 250:  
                 self._frames = self._frames[-250:]
+        
+        self.last_audio_time = time.time()
         return frame
 
     def get_and_clear_recording(self):
@@ -109,74 +256,44 @@ class RecorderProcessor(AudioProcessorBase):
             self._frames = []
         return frames
 
-
-# ----------------- UI -----------------
-st.title("📚 Kamus Kosakata Inggris-Indonesia — WebRTC STT (Waveform)")
-st.write("Instruksi: Klik **Start** (panel WebRTC di sidebar), tunggu 2-3 detik, lalu tekan tombol 🎙️ di kata yang ingin direkam.")
+# --- ANTARMUKA UTAMA STREAMLIT ---
+st.title("📚 Kamus Kosakata Inggris-Indonesia — WebRTC STT")
+st.markdown("""
+<p style="color:#666666;">
+Instruksi: Pilih topik di sidebar. Klik **Start** pada widget WebRTC, izinkan microphone, tunggu 2-3 detik, lalu tekan tombol 🎙️ di kata yang ingin direkam.
+</p>
+""", unsafe_allow_html=True)
 
 # Sidebar
 st.sidebar.title("Pengaturan & STT (Mic)")
 topic_list = list(vocab_data.keys())
-selected_topic = st.sidebar.radio("Daftar Topik", topic_list)
-
+selected_topic = st.sidebar.radio("Pilih Topik", topic_list)
 st.sidebar.markdown("---")
+
 st.sidebar.markdown("**Kontrol WebRTC / Microphone**")
-st.sidebar.markdown("1) Klik *Start* pada widget WebRTC di bawah → izinkan microphone.  \n2) Tunggu 2-3 detik agar buffer terisi.  \n3) Tekan 🎙️ di kata.")
-
-media_constraints = {
-    "audio": {
-        "echoCancellation": True,
-        "noiseSuppression": True,
-        "autoGainControl": True,
-    },
-    "video": False,
-}
-
 webrtc_ctx = webrtc_streamer(
     key="speech-to-text-global",
     mode=WebRtcMode.SENDRECV,
     audio_processor_factory=RecorderProcessor,
-    media_stream_constraints=media_constraints,
-    rtc_configuration={
-        "iceServers": [
-            {"urls": ["stun:stun.l.google.com:19302"]},
-            {"urls": ["turn:openrelay.metered.ca:80", "turn:openrelay.metered.ca:443"],
-             "username": "openrelayproject", "credential": "openrelayproject"}
-        ]
-    },
+    media_stream_constraints={ "audio": True, "video": False },
+    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
     async_processing=True,
     audio_receiver_size=256
 )
 
-# Waveform live indikator
-if webrtc_ctx and webrtc_ctx.state.playing and webrtc_ctx.audio_processor:
-    proc = webrtc_ctx.audio_processor
-    wf_placeholder = st.sidebar.empty()
-
-    def plot_waveform(waveform):
-        fig, ax = plt.subplots(figsize=(3,1))
-        ax.plot(waveform, color="cyan")
-        ax.set_ylim(0, np.max(waveform)*1.2 + 1e-3)
-        ax.axis("off")
-        return fig
-
-    wf_placeholder.pyplot(plot_waveform(proc.waveform))
-
-# Status
 if webrtc_ctx.state.playing:
     st.sidebar.success("WebRTC: microphone aktif ✅")
 else:
     st.sidebar.info("WebRTC: Tekan 'Start' dan izinkan microphone.")
 
-# ----------------- MAIN -----------------
+# Placeholder untuk pesan feedback
+message_placeholder = st.empty()
+
+# Tampilkan kosakata
 st.header(f"Topik: {selected_topic}")
 st.markdown("Klik 🔊 untuk mendengar kata. Klik 🎙️ untuk merekam & cek pengucapan.")
 
 vocabularies = vocab_data.get(selected_topic, [])
-
-def normalize_text(s: str) -> str:
-    return ''.join(ch for ch in s.lower() if ch.isalnum() or ch.isspace()).strip()
-
 for i, vocab in enumerate(vocabularies):
     word = vocab['kata']
     translation = vocab['terjemahan']
@@ -191,38 +308,44 @@ for i, vocab in enumerate(vocabularies):
         if st.button("🔊", key=f"tts_{selected_topic}_{i}"):
             path = text_to_speech(word)
             st.audio(path)
-
+        
         if st.button("🎙️", key=f"stt_{selected_topic}_{i}"):
             if not (webrtc_ctx and webrtc_ctx.state.playing and webrtc_ctx.audio_processor):
-                st.warning("⚠️ WebRTC belum aktif / mic belum diizinkan.")
+                message_placeholder.warning("⚠️ WebRTC belum aktif / mic belum diizinkan.")
             else:
-                processor = webrtc_ctx.audio_processor
-                frames = None
-                for _ in range(3):  # retry sampai 3x
+                message_placeholder.info("🗣️ Sedang merekam... Mohon ucapkan kata sekarang.")
+                
+                # Jeda singkat untuk memastikan audio diambil
+                time.sleep(1) 
+                
+                with st.spinner("Memproses rekaman..."):
+                    processor = webrtc_ctx.audio_processor
                     frames = processor.get_and_clear_recording()
-                    if frames:
-                        break
-                    time.sleep(0.6)
-
-                wav_bytes = frames_to_wav_bytes(frames)
-                if wav_bytes is None:
-                    st.warning("⚠️ Tidak ada audio — ulangi dan bicara lebih jelas 1–3 detik.")
-                else:
+                    
+                    if not frames:
+                        message_placeholder.warning("⚠️ Tidak ada audio yang terdeteksi. Coba lagi dan bicara lebih dekat.")
+                        continue
+                    
+                    wav_bytes = frames_to_wav_bytes(frames)
                     st.audio(wav_bytes, format="audio/wav")
+
                     recognizer = sr.Recognizer()
                     try:
                         with sr.AudioFile(io.BytesIO(wav_bytes)) as source:
                             audio_data = recognizer.record(source)
+                        
                         recognized = recognizer.recognize_google(audio_data, language='en-US')
+                        
                         if normalize_text(recognized) == normalize_text(word):
-                            st.success(f"✅ Cocok! Anda mengucapkan: **{recognized}**")
+                            message_placeholder.success(f"✅ Cocok! Anda mengucapkan: **{recognized}**")
                         else:
-                            st.error(f"❌ Tidak cocok. Anda mengucapkan: **{recognized}**")
+                            message_placeholder.error(f"❌ Tidak cocok. Anda mengucapkan: **{recognized}**")
                             st.info(f"Target: **{word}**")
-                            from difflib import SequenceMatcher
-                            score = SequenceMatcher(None, normalize_text(recognized), normalize_text(word)).ratio() * 100
-                            st.caption(f"Similarity: {score:.1f}%")
+
                     except sr.UnknownValueError:
-                        st.warning("⚠️ Google tidak bisa mengenali audio.")
+                        message_placeholder.warning("⚠️ Google tidak bisa mengenali audio.")
                     except Exception as e:
-                        st.error(f"⚠️ Error: {e}")
+                        message_placeholder.error(f"⚠️ Terjadi kesalahan: {e}")
+
+if __name__ == "__main__":
+    main()
