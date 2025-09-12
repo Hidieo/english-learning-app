@@ -1,46 +1,56 @@
 import streamlit as st
-import streamlit.components.v1 as components
 from streamlit_js_eval import streamlit_js_eval
 
 st.title("🎙️ Live Speech-to-Text (Realtime Captions)")
 
-if "recognized_text" not in st.session_state:
-    st.session_state.recognized_text = ""
+# Siapkan state untuk teks
+if "captions" not in st.session_state:
+    st.session_state["captions"] = ""
 
-components.html(
+# Komponen HTML + JS (pakai Web Speech API)
+st.markdown(
     """
     <script>
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
+    function startSTT() {
+        var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
 
-    recognition.onresult = function(event) {
-        var transcript = '';
-        for (var i = event.resultIndex; i < event.results.length; ++i) {
-            transcript += event.results[i][0].transcript;
-        }
-        // kirim ke Streamlit (streamlit-js-eval akan tangkap)
-        window.parent.postMessage({isStreamlitMessage:true, type:"streamlit:setComponentValue", value:transcript}, "*");
-    };
+        recognition.onresult = function(event) {
+            var interim_transcript = '';
+            var final_transcript = '';
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    final_transcript += event.results[i][0].transcript + " ";
+                } else {
+                    interim_transcript += event.results[i][0].transcript;
+                }
+            }
+            // kirim ke Python via streamlit-js-eval
+            const combined = final_transcript + " " + interim_transcript;
+            window.parent.postMessage(
+                {isStreamlitMessage:true, type:"streamlit:setComponentValue", value:combined},
+                "*"
+            );
+        };
 
-    function startSTT() { recognition.start(); }
-    function stopSTT() { recognition.stop(); }
+        recognition.start();
+    }
     </script>
-
-    <button onclick="startSTT()">▶️ Start</button>
-    <button onclick="stopSTT()">⏹ Stop</button>
-    <p>🎤 Klik Start lalu ucapkan kata</p>
+    <button onclick="startSTT()">▶️ Start Listening</button>
     """,
-    height=180,
+    unsafe_allow_html=True,
 )
 
-# Ambil data dari JS → Python
-captions = streamlit_js_eval(js_expressions="null", key="speech_to_text")
+# Ambil hasil dari JS
+captions = streamlit_js_eval(
+    js_expressions="null", 
+    key="speech_eval"
+)
 
 if captions:
-    st.session_state.recognized_text = captions
+    st.session_state["captions"] = captions
 
-st.subheader("Hasil Transkripsi 🎤")
-st.info(st.session_state.recognized_text)
+st.subheader("📝 Hasil Transkripsi")
+st.info(st.session_state["captions"])
