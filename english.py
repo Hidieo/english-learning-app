@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Kamus Kosakata Interaktif v2.0 - Stable WebRTC
+"""Kamus Kosakata Interaktif v2.1 - WebRTC with Volume Indicator
 
 This script implements a full Streamlit application for an interactive English-Indonesian
-vocabulary dictionary with stable WebRTC-based Speech-to-Text (STT) functionality.
+vocabulary dictionary with a more robust WebRTC-based Speech-to-Text (STT) functionality.
 """
 
 import streamlit as st
@@ -18,7 +18,7 @@ import time
 import speech_recognition as sr
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
 
-# --- KONFIGURASI APLIKASI ---
+# --- KONFIGURASI APLIKASI & TEMA ---
 TEMP_AUDIO_DIR = "temp_audio"
 if not os.path.exists(TEMP_AUDIO_DIR):
     os.makedirs(TEMP_AUDIO_DIR)
@@ -81,7 +81,6 @@ st.markdown("""
     .stButton > button:hover {
         background-color: #2196f3; /* Biru yang lebih terang saat hover */
     }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -234,12 +233,15 @@ class RecorderProcessor(AudioProcessorBase):
     def __init__(self):
         self._frames = []
         self._lock = threading.Lock()
-        self.last_audio_time = time.time()
+        self.volume_level = 0.0
 
     def recv_audio(self, frame: av.AudioFrame) -> av.AudioFrame:
         arr = frame.to_ndarray()
         if arr.ndim == 2:
             arr = arr[:, 0]
+        
+        # Hitung tingkat volume (RMS)
+        self.volume_level = np.sqrt(np.mean(arr.astype(np.float32) ** 2))
         
         with self._lock:
             self._frames.append(frame)
@@ -247,7 +249,6 @@ class RecorderProcessor(AudioProcessorBase):
             if len(self._frames) > 250:  
                 self._frames = self._frames[-250:]
         
-        self.last_audio_time = time.time()
         return frame
 
     def get_and_clear_recording(self):
@@ -260,7 +261,7 @@ class RecorderProcessor(AudioProcessorBase):
 st.title("📚 Kamus Kosakata Inggris-Indonesia — WebRTC STT")
 st.markdown("""
 <p style="color:#666666;">
-Instruksi: Pilih topik di sidebar. Klik **Start** pada widget WebRTC, izinkan microphone, tunggu 2-3 detik, lalu tekan tombol 🎙️ di kata yang ingin direkam.
+Instruksi: Pilih topik di sidebar. Klik **Start** pada widget WebRTC, izinkan microphone, tunggu 2-3 detik hingga indikator volume bergerak, lalu tekan tombol 🎙️ di kata yang ingin direkam.
 </p>
 """, unsafe_allow_html=True)
 
@@ -281,8 +282,14 @@ webrtc_ctx = webrtc_streamer(
     audio_receiver_size=256
 )
 
-if webrtc_ctx.state.playing:
-    st.sidebar.success("WebRTC: microphone aktif ✅")
+# Indikator volume visual
+if webrtc_ctx.state.playing and webrtc_ctx.audio_processor:
+    st.sidebar.markdown("WebRTC: Microphone aktif ✅")
+    volume_level = webrtc_ctx.audio_processor.volume_level
+    if volume_level > 0.01:
+        st.sidebar.info("Suara terdeteksi. Silakan rekam.")
+    else:
+        st.sidebar.warning("Tidak ada suara terdeteksi. Pastikan mic berfungsi.")
 else:
     st.sidebar.info("WebRTC: Tekan 'Start' dan izinkan microphone.")
 
