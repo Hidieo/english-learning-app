@@ -1,51 +1,55 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase, RTCConfiguration
-import speech_recognition as sr
-import numpy as np
-import av
+import streamlit.components.v1 as components
 
-# Konfigurasi WebRTC (penting untuk streamlit.io)
-RTC_CONFIGURATION = RTCConfiguration({
-    "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-})
+st.title("🎙️ Live Speech-to-Text (Realtime Captions)")
 
-class SpeechToTextProcessor(AudioProcessorBase):
-    def __init__(self) -> None:
-        self.recognizer = sr.Recognizer()
-        self.text_output = ""
+# Komponen HTML + JS untuk Web Speech API
+components.html(
+    """
+    <script>
+    var recognizing;
+    var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
 
-    def recv_audio(self, frame: av.AudioFrame) -> av.AudioFrame:
-        # Convert ke numpy array
-        audio = frame.to_ndarray().astype(np.int16)
+    recognition.onstart = function() {
+        document.getElementById('status').innerHTML = "🎤 Listening...";
+    };
 
-        # Simpan ke temporary wav
-        wav_path = "temp_audio/input.wav"
-        import soundfile as sf
-        sf.write(wav_path, audio, frame.sample_rate)
+    recognition.onend = function() {
+        document.getElementById('status').innerHTML = "🛑 Stopped";
+    };
 
-        # Coba transkrip dengan Google API
-        with sr.AudioFile(wav_path) as source:
-            audio_data = self.recognizer.record(source)
-            try:
-                result = self.recognizer.recognize_google(audio_data, language="en-US")
-                self.text_output = result
-            except sr.UnknownValueError:
-                self.text_output = ""
-            except sr.RequestError:
-                self.text_output = "[ERROR: Google API tidak bisa diakses]"
+    recognition.onresult = function(event) {
+        var interim_transcript = '';
+        var final_transcript = '';
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                final_transcript += event.results[i][0].transcript;
+            } else {
+                interim_transcript += event.results[i][0].transcript;
+            }
+        }
+        document.getElementById('final').innerHTML = final_transcript;
+        document.getElementById('interim').innerHTML = interim_transcript;
+    };
 
-        return frame
+    function startButton() {
+        recognition.start();
+    }
+    function stopButton() {
+        recognition.stop();
+    }
+    </script>
 
-
-st.subheader("🎙️ Speech Recognition Realtime")
-webrtc_ctx = webrtc_streamer(
-    key="speech-to-text-demo",
-    mode=WebRtcMode.SENDRECV,
-    rtc_configuration=RTC_CONFIGURATION,
-    audio_processor_factory=SpeechToTextProcessor,
-    media_stream_constraints={"audio": True, "video": False},
+    <button onclick="startButton()">▶️ Start</button>
+    <button onclick="stopButton()">⏹ Stop</button>
+    <p id="status">Not Listening</p>
+    <h3>Final:</h3>
+    <div id="final" style="color:green; font-weight:bold;"></div>
+    <h3>Interim:</h3>
+    <div id="interim" style="color:gray;"></div>
+    """,
+    height=400,
 )
-
-if webrtc_ctx.audio_processor:
-    st.markdown("**Hasil Transkripsi:**")
-    st.info(webrtc_ctx.audio_processor.text_output)
