@@ -8,3 +8,4 @@ streamlit
 streamlit_webrtc
 streamlit-audiorec
 streamlit-js-eval==0.1.7
+st_autorefresh
