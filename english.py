@@ -2,8 +2,23 @@ import streamlit as st
 import streamlit.components.v1 as components
 from streamlit_js_eval import streamlit_js_eval
 
-# Daftar kosakata (contoh kecil)
+# Contoh data kosakata
+vocab_data = {
+    "Greeting And Introduction": [
+        {"kata": "hello"},
+        {"kata": "good morning"},
+        {"kata": "how are you"}
+    ],
+    "Numbers, Dates, And Time": [
+        {"kata": "one"},
+        {"kata": "two"},
+        {"kata": "three"}
+    ]
+}
+
+# Kumpulkan semua kata untuk dicek
 vocab_words = [v["kata"].lower() for topic in vocab_data.values() for v in topic]
+
 
 st.title("🎙️ Live Speech-to-Text with Vocabulary Matching")
 
