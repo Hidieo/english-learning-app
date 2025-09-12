@@ -626,44 +626,48 @@ components.html(
         
         <!-- Tombol STT -->
         <button onclick="startRecognition('{en_word}')">🎙️ Tes Speaking</button>
-        <span id="result_{en_word.split('|')[0].replace(" ", "_")}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
+        
+        <span id="result_{en_word.split('|')[0].replace(" ", "_")}" 
+              style="margin-left:10px; font-weight:bold; color:gray;"></span>
     </div>
     
     <script>
+    // ==============================
     // TTS
+    // ==============================
     function speakWord(word) {{
         var utterance = new SpeechSynthesisUtterance(word);
         utterance.lang = "en-US";
         speechSynthesis.speak(utterance);
     }}
 
-    // Normalize yang menjaga letters + digits (menghapus tanda baca selain spasi)
-    function normalizeKeepDigits(text) {{
+    // ==============================
+    // Normalisasi (biarkan huruf + angka, hapus simbol lain)
+    // ==============================
+    function normalize(text) {{
         return text.toLowerCase()
                    .replace(/’/g, "'")
-                   .replace(/[^a-z0-9\\s]/g, "")  // izinkan a-z dan 0-9 serta spasi
+                   .replace(/[^a-z0-9\\s]/g, "")  // biarkan huruf a-z dan angka 0-9
                    .trim();
     }}
 
+    // ==============================
     // STT
+    // ==============================
     function startRecognition(targetWord) {{
         var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = "en-US";
         recognition.start();
 
         recognition.onresult = function(event) {{
-            var transcript = event.results[0][0].transcript; // jangan langsung toLowerCase di sini agar tampil aslinya
-            var resultElem = document.getElementById("result_" + targetWord.split("|")[0].replace(/ /g,"_"));
+            var transcript = event.results[0][0].transcript;
+            var resultElem = document.getElementById(
+                "result_" + targetWord.split("|")[0].replace(/ /g, "_")
+            );
 
-            // normalisasi transcript (tetap menyimpan angka)
-            var normalizedTranscript = normalizeKeepDigits(transcript);
+            var normalizedTranscript = normalize(transcript);
+            var normalizedTargets = targetWord.split("|").map(t => normalize(t));
 
-            // buat array alternatif dari targetWord, lalu normalisasi tiap item
-            var normalizedTargets = targetWord.split("|").map(function(t) {{
-                return normalizeKeepDigits(t);
-            }});
-
-            // beberapa STT kadang menambahkan titik (1.), koma, dsb -> regex di normalizeKeepDigits menghapusnya jadi "1"
             if (normalizedTargets.includes(normalizedTranscript)) {{
                 resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                 resultElem.style.color = "green";
