@@ -1,9 +1,13 @@
 import streamlit as st
 import streamlit.components.v1 as components
+from streamlit_js_eval import streamlit_js_eval
 
-st.title("🎙️ Live Speech-to-Text (Realtime Captions)")
+# Daftar kosakata (contoh kecil)
+vocab_words = [v["kata"].lower() for topic in vocab_data.values() for v in topic]
 
-# Komponen HTML + JS untuk Web Speech API
+st.title("🎙️ Live Speech-to-Text with Vocabulary Matching")
+
+# Komponen HTML untuk Web Speech API
 components.html(
     """
     <script>
@@ -12,14 +16,6 @@ components.html(
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = "en-US";
-
-    recognition.onstart = function() {
-        document.getElementById('status').innerHTML = "🎤 Listening...";
-    };
-
-    recognition.onend = function() {
-        document.getElementById('status').innerHTML = "🛑 Stopped";
-    };
 
     recognition.onresult = function(event) {
         var interim_transcript = '';
@@ -31,8 +27,13 @@ components.html(
                 interim_transcript += event.results[i][0].transcript;
             }
         }
-        document.getElementById('final').innerHTML = final_transcript;
-        document.getElementById('interim').innerHTML = interim_transcript;
+        // Kirim hasil final ke Python
+        const streamlitDoc = window.parent.document;
+        const input = streamlitDoc.querySelector('textarea[data-testid="stTextInput-input"]');
+        if (input) {
+            input.value = final_transcript;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
     };
 
     function startButton() {
@@ -45,11 +46,24 @@ components.html(
 
     <button onclick="startButton()">▶️ Start</button>
     <button onclick="stopButton()">⏹ Stop</button>
-    <p id="status">Not Listening</p>
-    <h3>Final:</h3>
-    <div id="final" style="color:green; font-weight:bold;"></div>
-    <h3>Interim:</h3>
-    <div id="interim" style="color:gray;"></div>
     """,
-    height=400,
+    height=150,
 )
+
+# Input tersembunyi buat menampung hasil transkrip
+transcript = st.text_input("Hidden transcript", key="speech_text")
+
+if transcript:
+    st.markdown(f"📝 Teks terdeteksi: **{transcript}**")
+
+    words = transcript.lower().split()
+    matched = [w for w in words if w in vocab_words]
+
+    if matched:
+        for w in words:
+            if w in matched:
+                st.markdown(f"<span style='color:green; font-weight:bold'>{w}</span>", unsafe_allow_html=True)
+            else:
+                st.markdown(w, unsafe_allow_html=True)
+    else:
+        st.warning("❌ Tidak ada kata yang cocok dengan kosakata.")
