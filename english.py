@@ -1,90 +1,43 @@
-# -*- coding: utf-8 -*-
-"""Kamus Kosakata Interaktif v2.1 - WebRTC with Volume Indicator
-
-This script implements a full Streamlit application for an interactive English-Indonesian
-vocabulary dictionary with a more robust WebRTC-based Speech-to-Text (STT) functionality.
-"""
-
 import streamlit as st
 import gtts
 from gtts import gTTS
-import os
-import threading
-import numpy as np
-import av
-import io
-import wave
-import time
 import speech_recognition as sr
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
+import os
 
-# --- KONFIGURASI APLIKASI & TEMA ---
+# Tentukan direktori untuk menyimpan file audio sementara
 TEMP_AUDIO_DIR = "temp_audio"
 if not os.path.exists(TEMP_AUDIO_DIR):
     os.makedirs(TEMP_AUDIO_DIR)
 
-st.set_page_config(
-    page_title="Kamus Kosakata Interaktif",
-    page_icon="📚",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# --- FUNGSI-FUNGSI UTAMA ---
 
-# Kustomisasi CSS untuk perpaduan biru dan putih
-st.markdown("""
-<style>
-    /* Mengubah warna sidebar */
-    .st-emotion-cache-121bd7t.e1ds3rsq1 {
-        background-color: #f0f2f6;
-        color: #0d47a1;
-    }
-    
-    /* Warna teks di sidebar */
-    .st-emotion-cache-vk3ypu.e1ds3rsq3 {
-        color: #0d47a1;
-    }
-    
-    /* Warna background utama */
-    .st-emotion-cache-1cypj85.e1ds3rsq0 {
-        background-color: #ffffff;
-    }
-    
-    /* Kustomisasi button */
-    .st-emotion-cache-6q9sum.e1ds3rsq1 {
-        background-color: #0d47a1;
-        color: white;
-        border-radius: 8px;
-        border: 1px solid #0d47a1;
-    }
-    .st-emotion-cache-6q9sum.e1ds3rsq1:hover {
-        background-color: #1976d2;
-    }
-    .st-emotion-cache-14u43f8.e1ds3rsq1 {
-        background-color: #1e88e5;
-        color: white;
-        border-radius: 8px;
-        border: 1px solid #1e88e5;
-    }
-    .st-emotion-cache-14u43f8.e1ds3rsq1:hover {
-        background-color: #2196f3;
-    }
-    
-    /* Button untuk TTS & STT */
-    .stButton > button {
-        background-color: #1e88e5; /* Biru terang */
-        color: white;
-        border-radius: 5px;
-        border: none;
-        padding: 8px 12px;
-        font-weight: bold;
-    }
-    .stButton > button:hover {
-        background-color: #2196f3; /* Biru yang lebih terang saat hover */
-    }
-</style>
-""", unsafe_allow_html=True)
+def text_to_speech(text):
+    """Mengubah teks menjadi file audio MP3."""
+    tts = gTTS(text=text, lang='en')
+    with open(f"{TEMP_AUDIO_DIR}/temp.mp3", "wb") as f:
+        tts.write_to_fp(f)
+    return f"{TEMP_AUDIO_DIR}/temp.mp3"
 
-# --- DATA KOSAKATA ---
+def speech_to_text():
+    """Merekam suara dari mikrofon dan mengubahnya menjadi teks."""
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        st.info("Sedang mendengarkan... Mohon ucapkan kata tersebut.")
+        audio = r.listen(source)
+    
+    try:
+        st.info("Mengenali ucapan...")
+        text = r.recognize_google(audio, language="en-US")
+        return text
+    except sr.UnknownValueError:
+        st.error("❌ Maaf, tidak dapat memahami ucapan Anda.")
+        return None
+    except sr.RequestError as e:
+        st.error(f"❌ Maaf, terjadi kesalahan layanan; {e}")
+        return None
+
+# --- DATA KOSAKATA (Sama seperti sebelumnya) ---
+
 vocab_data = {
     "Hewan": [
         {'kata': 'Cat', 'terjemahan': 'Kucing', 'pelafalan': '(ket)'},
@@ -198,161 +151,149 @@ vocab_data = {
     ]
 }
 
-# --- FUNGSI-FUNGSI UTAMA ---
-def text_to_speech(text: str) -> str:
-    """Mengubah teks menjadi file audio MP3."""
-    safe_name = text.replace(' ', '_')
-    out_path = os.path.join(TEMP_AUDIO_DIR, f"{safe_name}.mp3")
-    if not os.path.exists(out_path):
-        tts = gTTS(text=text, lang='en')
-        tts.save(out_path)
-    return out_path
+# --- KONFIGURASI TEMA DAN KUSTOMISASI CSS ---
 
-def frames_to_wav_bytes(frames):
-    """Mengubah frames audio dari WebRTC menjadi format WAV bytes."""
-    if not frames:
-        return None
-    sample_rate = frames[0].sample_rate
-    pcm_arrays = [frame.to_ndarray().mean(axis=0) if frame.to_ndarray().ndim == 2 else frame.to_ndarray() for frame in frames]
-    concat = np.concatenate(pcm_arrays).astype(np.int16)
-    buf = io.BytesIO()
-    with wave.open(buf, 'wb') as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(sample_rate)
-        wf.writeframes(concat.tobytes())
-    buf.seek(0)
-    return buf.read()
-
-def normalize_text(s: str) -> str:
-    """Menghilangkan karakter non-alfanumerik untuk perbandingan."""
-    return ''.join(ch for ch in s.lower() if ch.isalnum() or ch.isspace()).strip()
-
-# --- AUDIO PROCESSOR UNTUK STREAMLIT-WEBRTC ---
-class RecorderProcessor(AudioProcessorBase):
-    def __init__(self):
-        self._frames = []
-        self._lock = threading.Lock()
-        self.volume_level = 0.0
-
-    def recv_audio(self, frame: av.AudioFrame) -> av.AudioFrame:
-        arr = frame.to_ndarray()
-        if arr.ndim == 2:
-            arr = arr[:, 0]
-        
-        # Hitung tingkat volume (RMS)
-        self.volume_level = np.sqrt(np.mean(arr.astype(np.float32) ** 2))
-        
-        with self._lock:
-            self._frames.append(frame)
-            # Batasi buffer ke 3-4 detik
-            if len(self._frames) > 250:  
-                self._frames = self._frames[-250:]
-        
-        return frame
-
-    def get_and_clear_recording(self):
-        with self._lock:
-            frames = list(self._frames)
-            self._frames = []
-        return frames
-
-# --- ANTARMUKA UTAMA STREAMLIT ---
-st.title("📚 Kamus Kosakata Inggris-Indonesia — WebRTC STT")
-st.markdown("""
-<p style="color:#666666;">
-Instruksi: Pilih topik di sidebar. Klik **Start** pada widget WebRTC, izinkan microphone, tunggu 2-3 detik hingga indikator volume bergerak, lalu tekan tombol 🎙️ di kata yang ingin direkam.
-</p>
-""", unsafe_allow_html=True)
-
-# Sidebar
-st.sidebar.title("Pengaturan & STT (Mic)")
-topic_list = list(vocab_data.keys())
-selected_topic = st.sidebar.radio("Pilih Topik", topic_list)
-st.sidebar.markdown("---")
-
-st.sidebar.markdown("**Kontrol WebRTC / Microphone**")
-webrtc_ctx = webrtc_streamer(
-    key="speech-to-text-global",
-    mode=WebRtcMode.SENDRECV,
-    audio_processor_factory=RecorderProcessor,
-    media_stream_constraints={ "audio": True, "video": False },
-    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-    async_processing=True,
-    audio_receiver_size=256
+# Setel tema default ke mode terang
+st.set_page_config(
+    page_title="Kamus Kosakata Interaktif",
+    page_icon="📚",
+    layout="centered",
+    initial_sidebar_state="expanded"
 )
 
-# Indikator volume visual
-if webrtc_ctx.state.playing and webrtc_ctx.audio_processor:
-    st.sidebar.markdown("WebRTC: Microphone aktif ✅")
-    volume_level = webrtc_ctx.audio_processor.volume_level
-    if volume_level > 0.01:
-        st.sidebar.info("Suara terdeteksi. Silakan rekam.")
+# Kustomisasi CSS untuk perpaduan biru dan putih
+st.markdown("""
+<style>
+    /* Mengubah warna sidebar */
+    .st-emotion-cache-121bd7t.e1ds3rsq1 {
+        background-color: #f0f2f6;
+        color: #0d47a1;
+    }
+    
+    /* Warna teks di sidebar */
+    .st-emotion-cache-vk3ypu.e1ds3rsq3 {
+        color: #0d47a1;
+    }
+    
+    /* Warna background utama */
+    .st-emotion-cache-1cypj85.e1ds3rsq0 {
+        background-color: #ffffff;
+    }
+
+    /* Kustomisasi button */
+    .st-emotion-cache-6q9sum.e1ds3rsq1 {
+        background-color: #0d47a1;
+        color: white;
+        border-radius: 8px;
+        border: 1px solid #0d47a1;
+    }
+    .st-emotion-cache-6q9sum.e1ds3rsq1:hover {
+        background-color: #1976d2;
+    }
+    .st-emotion-cache-14u43f8.e1ds3rsq1 {
+        background-color: #1e88e5;
+        color: white;
+        border-radius: 8px;
+        border: 1px solid #1e88e5;
+    }
+    .st-emotion-cache-14u43f8.e1ds3rsq1:hover {
+        background-color: #2196f3;
+    }
+    
+    /* Button untuk TTS & STT */
+    .stButton > button {
+        background-color: #1e88e5; /* Biru terang */
+        color: white;
+        border-radius: 5px;
+        border: none;
+        padding: 8px 12px;
+        font-weight: bold;
+    }
+    .stButton > button:hover {
+        background-color: #2196f3; /* Biru yang lebih terang saat hover */
+    }
+
+</style>
+""", unsafe_allow_html=True)
+
+
+# --- ANTARMUKA UTAMA STREAMLIT ---
+
+def main():
+    st.title("📚 Kamus Kosakata Inggris-Indonesia")
+    st.markdown("""
+    <p style="color:#666666;">
+    Pilih topik di sidebar untuk melihat daftar kosakata. Klik tombol <span style="color:#1e88e5;">🔊</span> untuk mendengarkan pengucapan dan <span style="color:#1e88e5;">🎙️</span> untuk mengecek pelafalan Anda.
+    </p>
+    """, unsafe_allow_html=True)
+
+    st.write("---")
+
+    # Sidebar untuk memilih topik dan tema
+    st.sidebar.title("Pengaturan")
+    
+    # Fitur untuk mengubah tema
+    theme_option = st.sidebar.radio(
+        "Pilih Tema Latar Belakang",
+        ("Terang (Biru & Putih)", "Gelap (Default)")
+    )
+
+    if theme_option == "Terang (Biru & Putih)":
+        st.session_state['theme'] = 'light'
     else:
-        st.sidebar.warning("Tidak ada suara terdeteksi. Pastikan mic berfungsi.")
-else:
-    st.sidebar.info("WebRTC: Tekan 'Start' dan izinkan microphone.")
-
-# Placeholder untuk pesan feedback
-message_placeholder = st.empty()
-
-# Tampilkan kosakata
-st.header(f"Topik: {selected_topic}")
-st.markdown("Klik 🔊 untuk mendengar kata. Klik 🎙️ untuk merekam & cek pengucapan.")
-
-vocabularies = vocab_data.get(selected_topic, [])
-for i, vocab in enumerate(vocabularies):
-    word = vocab['kata']
-    translation = vocab['terjemahan']
-    pronunciation = vocab['pelafalan']
-
-    col1, col2, col3 = st.columns([0.4, 0.4, 0.2])
-    with col1:
-        st.markdown(f"**{word}**")
-    with col2:
-        st.markdown(f"*{translation}* {pronunciation}")
-    with col3:
-        if st.button("🔊", key=f"tts_{selected_topic}_{i}"):
-            path = text_to_speech(word)
-            st.audio(path)
+        st.session_state['theme'] = 'dark'
         
-        if st.button("🎙️", key=f"stt_{selected_topic}_{i}"):
-            if not (webrtc_ctx and webrtc_ctx.state.playing and webrtc_ctx.audio_processor):
-                message_placeholder.warning("⚠️ WebRTC belum aktif / mic belum diizinkan.")
-            else:
-                message_placeholder.info("🗣️ Sedang merekam... Mohon ucapkan kata sekarang.")
+    st.sidebar.markdown("---")
+    
+    st.sidebar.title("Pilih Topik")
+    topic_list = list(vocab_data.keys())
+    selected_topic = st.sidebar.radio("Daftar Topik", topic_list)
+    
+    st.header(f"Topik: {selected_topic}")
+    
+    vocabularies = vocab_data.get(selected_topic, [])
+    
+    for i, vocab in enumerate(vocabularies):
+        word = vocab['kata']
+        translation = vocab['terjemahan']
+        pronunciation = vocab['pelafalan']
+        
+        col1, col2, col3, col4 = st.columns([0.4, 0.4, 0.1, 0.1])
+        
+        with col1:
+            st.markdown(f"**{word}**")
+        with col2:
+            st.markdown(f"*{translation}* ({pronunciation})")
+            
+        with col3:
+            # Tombol TTS untuk memutar audio
+            if st.button("🔊", key=f"tts_{word}_{i}"):
+                audio_file_path = text_to_speech(word)
+                with open(audio_file_path, "rb") as f:
+                    audio_bytes = f.read()
+                    st.audio(audio_bytes, format='audio/mp3', start_time=0)
+                # Hapus file audio setelah digunakan
+                os.remove(audio_file_path)
                 
-                # Jeda singkat untuk memastikan audio diambil
-                time.sleep(1) 
+        with col4:
+            # Tombol STT untuk merekam dan memeriksa
+            st.session_state.setdefault(f'stt_result_{word}_{i}', None)
+            if st.button("🎙️", key=f"stt_{word}_{i}"):
+                recognized_text = speech_to_text()
                 
-                with st.spinner("Memproses rekaman..."):
-                    processor = webrtc_ctx.audio_processor
-                    frames = processor.get_and_clear_recording()
-                    
-                    if not frames:
-                        message_placeholder.warning("⚠️ Tidak ada audio yang terdeteksi. Coba lagi dan bicara lebih dekat.")
-                        continue
-                    
-                    wav_bytes = frames_to_wav_bytes(frames)
-                    st.audio(wav_bytes, format="audio/wav")
-
-                    recognizer = sr.Recognizer()
-                    try:
-                        with sr.AudioFile(io.BytesIO(wav_bytes)) as source:
-                            audio_data = recognizer.record(source)
-                        
-                        recognized = recognizer.recognize_google(audio_data, language='en-US')
-                        
-                        if normalize_text(recognized) == normalize_text(word):
-                            message_placeholder.success(f"✅ Cocok! Anda mengucapkan: **{recognized}**")
-                        else:
-                            message_placeholder.error(f"❌ Tidak cocok. Anda mengucapkan: **{recognized}**")
-                            st.info(f"Target: **{word}**")
-
-                    except sr.UnknownValueError:
-                        message_placeholder.warning("⚠️ Google tidak bisa mengenali audio.")
-                    except Exception as e:
-                        message_placeholder.error(f"⚠️ Terjadi kesalahan: {e}")
+                if recognized_text:
+                    if recognized_text.lower() == word.lower():
+                        st.session_state[f'stt_result_{word}_{i}'] = True
+                        st.success("✅ Benar!")
+                    else:
+                        st.session_state[f'stt_result_{word}_{i}'] = False
+                        st.error(f"❌ Salah. Anda mengucapkan: '{recognized_text}'")
+                
+                # Menampilkan status ceklis
+            if st.session_state.get(f'stt_result_{word}_{i}'):
+                st.markdown("✅", help="Pelafalan Anda benar!")
+            elif st.session_state.get(f'stt_result_{word}_{i}') is False:
+                st.markdown("❌", help="Pelafalan Anda salah.")
 
 if __name__ == "__main__":
     main()
