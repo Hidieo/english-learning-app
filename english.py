@@ -88,6 +88,7 @@ def render_transcript():
         if displayed_text:
             output_area.markdown("<br>".join(displayed_text), unsafe_allow_html=True)
 
-# Auto-refresh setiap 1 detik supaya real-time
-st_autorefresh = st.experimental_rerun
+# Auto-refresh setiap 1 detik (1000 ms)
+st_autorefresh(interval=1000, limit=None, key="refresh")
+
 render_transcript()
