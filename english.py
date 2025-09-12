@@ -657,7 +657,7 @@ for vocab in vocab_list:
                 var normalizedTranscript = normalize(transcript);
                 var normalizedTarget = normalize(targetWord);
                 
-                if (normalizedTranscript.includes(normalizedTarget)) {{
+                if (normalizedTranscript === normalizedTarget) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
                 }} else {{
