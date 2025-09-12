@@ -5,18 +5,104 @@ st.set_page_config(page_title="Kamus Kosakata", layout="wide")
 
 st.title("📚 Kamus Kosakata Inggris-Indonesia — TTS & STT")
 
-# Daftar vocabulary (bisa diganti sesuai kebutuhan)
-vocab_list = [
-    {"en": "cat", "id": "kucing"},
-    {"en": "dog", "id": "anjing"},
-    {"en": "apple", "id": "apel"},
-    {"en": "banana", "id": "pisang"}
-]
+# ======================
+# Daftar 16 Topik
+# ======================
+topics = {
+    "Hewan": [
+        {"en": "cat", "id": "kucing"},
+        {"en": "dog", "id": "anjing"},
+        {"en": "bird", "id": "burung"},
+    ],
+    "Buah": [
+        {"en": "apple", "id": "apel"},
+        {"en": "banana", "id": "pisang"},
+        {"en": "grape", "id": "anggur"},
+    ],
+    "Transportasi": [
+        {"en": "car", "id": "mobil"},
+        {"en": "train", "id": "kereta"},
+        {"en": "bicycle", "id": "sepeda"},
+    ],
+    "Warna": [
+        {"en": "red", "id": "merah"},
+        {"en": "blue", "id": "biru"},
+        {"en": "green", "id": "hijau"},
+    ],
+    "Anggota Tubuh": [
+        {"en": "hand", "id": "tangan"},
+        {"en": "eye", "id": "mata"},
+        {"en": "leg", "id": "kaki"},
+    ],
+    "Pakaian": [
+        {"en": "shirt", "id": "baju"},
+        {"en": "pants", "id": "celana"},
+        {"en": "hat", "id": "topi"},
+    ],
+    "Sekolah": [
+        {"en": "book", "id": "buku"},
+        {"en": "pen", "id": "pena"},
+        {"en": "teacher", "id": "guru"},
+    ],
+    "Profesi": [
+        {"en": "doctor", "id": "dokter"},
+        {"en": "police", "id": "polisi"},
+        {"en": "farmer", "id": "petani"},
+    ],
+    "Olahraga": [
+        {"en": "soccer", "id": "sepak bola"},
+        {"en": "basketball", "id": "bola basket"},
+        {"en": "swimming", "id": "renang"},
+    ],
+    "Makanan": [
+        {"en": "rice", "id": "nasi"},
+        {"en": "bread", "id": "roti"},
+        {"en": "chicken", "id": "ayam"},
+    ],
+    "Minuman": [
+        {"en": "water", "id": "air"},
+        {"en": "milk", "id": "susu"},
+        {"en": "tea", "id": "teh"},
+    ],
+    "Keluarga": [
+        {"en": "father", "id": "ayah"},
+        {"en": "mother", "id": "ibu"},
+        {"en": "sister", "id": "saudara perempuan"},
+    ],
+    "Peralatan": [
+        {"en": "knife", "id": "pisau"},
+        {"en": "spoon", "id": "sendok"},
+        {"en": "chair", "id": "kursi"},
+    ],
+    "Arah": [
+        {"en": "left", "id": "kiri"},
+        {"en": "right", "id": "kanan"},
+        {"en": "straight", "id": "lurus"},
+    ],
+    "Waktu": [
+        {"en": "morning", "id": "pagi"},
+        {"en": "afternoon", "id": "siang"},
+        {"en": "night", "id": "malam"},
+    ],
+    "Cuaca": [
+        {"en": "rain", "id": "hujan"},
+        {"en": "sun", "id": "matahari"},
+        {"en": "cloud", "id": "awan"},
+    ],
+}
 
-# Konversi ke JS
-vocab_js = str([v["en"] for v in vocab_list]).replace("'", '"')
+# ======================
+# Menu pilih topik
+# ======================
+topic_choice = st.sidebar.radio("📌 Pilih Topik", list(topics.keys()))
 
-# Render UI
+st.subheader(f"📖 Topik: {topic_choice}")
+
+# ======================
+# Tampilkan Vocabulary
+# ======================
+vocab_list = topics[topic_choice]
+
 for vocab in vocab_list:
     en_word = vocab["en"]
     id_word = vocab["id"]
