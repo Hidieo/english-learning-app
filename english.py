@@ -1,5 +1,6 @@
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
+from streamlit_autorefresh import st_autorefresh
 import speech_recognition as sr
 import av
 import threading
@@ -59,7 +60,7 @@ st.title("🎤 Live Caption + Vocabulary Highlight")
 
 webrtc_streamer(
     key="speech-to-text",
-    mode=WebRtcMode.SENDONLY,   # ✅ pakai enum, bukan string
+    mode=WebRtcMode.SENDONLY,   # ✅ enum, bukan string
     audio_frame_callback=process_audio,
     media_stream_constraints={"audio": True, "video": False},
 )
@@ -88,7 +89,7 @@ def render_transcript():
         if displayed_text:
             output_area.markdown("<br>".join(displayed_text), unsafe_allow_html=True)
 
-# Auto-refresh setiap 1 detik (1000 ms)
+# Auto-refresh tiap 1 detik
 st_autorefresh(interval=1000, limit=None, key="refresh")
 
 render_transcript()
