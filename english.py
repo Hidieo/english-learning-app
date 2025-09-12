@@ -25,50 +25,50 @@ topics = {
     {"english": "You’re welcome", "phonetic": "Yor welkom", "indonesia": "Sama-sama"},
     {"english": "My pleasure", "phonetic": "Mai plezur", "indonesia": "Senang bisa membantu"}
 ],
-"Topic 2a - Numbers": [
-    {"english": "one", "phonetic": "wan", "indonesia": "1"},
-    {"english": "two", "phonetic": "twu", "indonesia": "2"},
-    {"english": "three", "phonetic": "thri", "indonesia": "3"},
-    {"english": "four", "phonetic": "for", "indonesia": "4"},
-    {"english": "five", "phonetic": "faiv", "indonesia": "5"},
-    {"english": "six", "phonetic": "siks", "indonesia": "6"},
-    {"english": "seven", "phonetic": "seven", "indonesia": "7"},
-    {"english": "eight", "phonetic": "eit", "indonesia": "8"},
-    {"english": "nine", "phonetic": "nain", "indonesia": "9"},
-    {"english": "ten", "phonetic": "ten", "indonesia": "10"},
-    {"english": "eleven", "phonetic": "ilevn", "indonesia": "11"},
-    {"english": "twelve", "phonetic": "twelv", "indonesia": "12"},
-    {"english": "thirteen", "phonetic": "thertin", "indonesia": "13"},
-    {"english": "fourteen", "phonetic": "forti:n", "indonesia": "14"},
-    {"english": "fifteen", "phonetic": "fifti:n", "indonesia": "15"},
-    {"english": "sixteen", "phonetic": "sixti:n", "indonesia": "16"},
-    {"english": "seventeen", "phonetic": "seventi:n", "indonesia": "17"},
-    {"english": "eighteen", "phonetic": "eiti:n", "indonesia": "18"},
-    {"english": "nineteen", "phonetic": "nainti:n", "indonesia": "19"},
-    {"english": "twenty", "phonetic": "twenti", "indonesia": "20"}
-],
-"Topic 2b - Ordinal Numbers": [
-    {"english": "1st", "phonetic": "first", "indonesia": "pertama"},
-    {"english": "2nd", "phonetic": "second", "indonesia": "kedua"},
-    {"english": "3rd", "phonetic": "third", "indonesia": "ketiga"},
-    {"english": "4th", "phonetic": "fourth", "indonesia": "keempat"},
-    {"english": "5th", "phonetic": "fifth", "indonesia": "kelima"},
-    {"english": "6th", "phonetic": "sixth", "indonesia": "keenam"},
-    {"english": "7th", "phonetic": "seventh", "indonesia": "ketujuh"},
-    {"english": "8th", "phonetic": "eighth", "indonesia": "kedelapan"},
-    {"english": "9th", "phonetic": "ninth", "indonesia": "kesembilan"},
-    {"english": "10th", "phonetic": "tenth", "indonesia": "kesepuluh"},
-    {"english": "11th", "phonetic": "eleventh", "indonesia": "kesebelas"},
-    {"english": "12th", "phonetic": "twelfth", "indonesia": "kedua belas"},
-    {"english": "13th", "phonetic": "thirteenth", "indonesia": "ketiga belas"},
-    {"english": "14th", "phonetic": "fourteenth", "indonesia": "keempat belas"},
-    {"english": "15th", "phonetic": "fifteenth", "indonesia": "kelima belas"},
-    {"english": "16th", "phonetic": "sixteenth", "indonesia": "keenam belas"},
-    {"english": "17th", "phonetic": "seventeenth", "indonesia": "ketujuh belas"},
-    {"english": "18th", "phonetic": "eighteenth", "indonesia": "kedelapan belas"},
-    {"english": "19th", "phonetic": "nineteenth", "indonesia": "kesembilan belas"},
-    {"english": "20th", "phonetic": "twentieth", "indonesia": "kedua puluh"}
-],
+    "Topic 2a - Numbers": [
+        {"english": "one|1", "phonetic": "wan", "indonesia": "1"},
+        {"english": "two|2", "phonetic": "twu", "indonesia": "2"},
+        {"english": "three|3", "phonetic": "thri", "indonesia": "3"},
+        {"english": "four|4", "phonetic": "for", "indonesia": "4"},
+        {"english": "five|5", "phonetic": "faiv", "indonesia": "5"},
+        {"english": "six|6", "phonetic": "siks", "indonesia": "6"},
+        {"english": "seven|7", "phonetic": "seven", "indonesia": "7"},
+        {"english": "eight|8", "phonetic": "eit", "indonesia": "8"},
+        {"english": "nine|9", "phonetic": "nain", "indonesia": "9"},
+        {"english": "ten|10", "phonetic": "ten", "indonesia": "10"},
+        {"english": "eleven|11", "phonetic": "ilevn", "indonesia": "11"},
+        {"english": "twelve|12", "phonetic": "twelv", "indonesia": "12"},
+        {"english": "thirteen|13", "phonetic": "thertin", "indonesia": "13"},
+        {"english": "fourteen|14", "phonetic": "forti:n", "indonesia": "14"},
+        {"english": "fifteen|15", "phonetic": "fifti:n", "indonesia": "15"},
+        {"english": "sixteen|16", "phonetic": "sixti:n", "indonesia": "16"},
+        {"english": "seventeen|17", "phonetic": "seventi:n", "indonesia": "17"},
+        {"english": "eighteen|18", "phonetic": "eiti:n", "indonesia": "18"},
+        {"english": "nineteen|19", "phonetic": "nainti:n", "indonesia": "19"},
+        {"english": "twenty|20", "phonetic": "twenti", "indonesia": "20"}
+    ],
+    "Topic 2b - Ordinal Numbers": [
+        {"english": "1st|first", "phonetic": "first", "indonesia": "pertama"},
+        {"english": "2nd|second", "phonetic": "second", "indonesia": "kedua"},
+        {"english": "3rd|third", "phonetic": "third", "indonesia": "ketiga"},
+        {"english": "4th|fourth", "phonetic": "fourth", "indonesia": "keempat"},
+        {"english": "5th|fifth", "phonetic": "fifth", "indonesia": "kelima"},
+        {"english": "6th|sixth", "phonetic": "sixth", "indonesia": "keenam"},
+        {"english": "7th|seventh", "phonetic": "seventh", "indonesia": "ketujuh"},
+        {"english": "8th|eighth", "phonetic": "eighth", "indonesia": "kedelapan"},
+        {"english": "9th|ninth", "phonetic": "ninth", "indonesia": "kesembilan"},
+        {"english": "10th|tenth", "phonetic": "tenth", "indonesia": "kesepuluh"},
+        {"english": "11th|eleventh", "phonetic": "eleventh", "indonesia": "kesebelas"},
+        {"english": "12th|twelfth", "phonetic": "twelfth", "indonesia": "kedua belas"},
+        {"english": "13th|thirteenth", "phonetic": "thirteenth", "indonesia": "ketiga belas"},
+        {"english": "14th|fourteenth", "phonetic": "fourteenth", "indonesia": "keempat belas"},
+        {"english": "15th|fifteenth", "phonetic": "fifteenth", "indonesia": "kelima belas"},
+        {"english": "16th|sixteenth", "phonetic": "sixteenth", "indonesia": "keenam belas"},
+        {"english": "17th|seventeenth", "phonetic": "seventeenth", "indonesia": "ketujuh belas"},
+        {"english": "18th|eighteenth", "phonetic": "eighteenth", "indonesia": "kedelapan belas"},
+        {"english": "19th|nineteenth", "phonetic": "nineteenth", "indonesia": "kesembilan belas"},
+        {"english": "20th|twentieth", "phonetic": "twentieth", "indonesia": "kedua puluh"}
+    ],
     "Topic 2c - Days": [
         {"english": "Sunday", "phonetic": "sandei", "indonesia": "Minggu"},
         {"english": "Monday", "phonetic": "mandei", "indonesia": "Senin"},
@@ -655,9 +655,9 @@ for vocab in vocab_list:
                 var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_"));
 
                 var normalizedTranscript = normalize(transcript);
-                var normalizedTarget = normalize(targetWord);
+                var normalizedTargets = targetWord.split("|").map(t => normalize(t));
                 
-                if (normalizedTranscript === normalizedTarget) {{
+                if (normalizedTargets === normalizedTranscript) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
                 }} else {{
