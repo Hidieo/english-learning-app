@@ -622,10 +622,10 @@ for vocab in vocab_list:
         f"""
         <div style="margin-bottom:15px;">
             <!-- Tombol TTS -->
-            <button onclick="speakWord('{en_word}')">🔊 TTS</button>
+            <button onclick="speakWord('{en_word}')">🔊 Pronounce</button>
             
             <!-- Tombol STT -->
-            <button onclick="startRecognition('{en_word}')">🎙️ STT</button>
+            <button onclick="startRecognition('{en_word}')">🎙️ Test Speaking</button>
             <span id="result_{en_word.replace(" ", "_")}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
         </div>
 
@@ -635,6 +635,13 @@ for vocab in vocab_list:
             var utterance = new SpeechSynthesisUtterance(word);
             utterance.lang = "en-US";
             speechSynthesis.speak(utterance);
+        }}
+
+        function normalize(text) {{
+            return text.toLowerCase()
+                       .replace(/’/g, "'")
+                       .replace(/[^a-zA-Z\s]/g, "")
+                       .trim();
         }}
 
         // STT
@@ -647,7 +654,10 @@ for vocab in vocab_list:
                 var transcript = event.results[0][0].transcript.toLowerCase();
                 var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_"));
 
-                if (transcript.includes(targetWord.toLowerCase())) {{
+                var normalizedTranscript = normalize(transcript);
+                var normalizedTarget = normalize(targetWord);
+                
+                if (normalizedTranscript===normalizedTarget) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
                 }} else {{
