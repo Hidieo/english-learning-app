@@ -9,86 +9,45 @@ st.title("📚 Kamus Kosakata Inggris-Indonesia — TTS & STT")
 # Daftar 16 Topik
 # ======================
 topics = {
-    "Hewan": [
-        {"en": "cat", "id": "kucing"},
-        {"en": "dog", "id": "anjing"},
-        {"en": "bird", "id": "burung"},
+    "Topic 1 - Greeting & Expression": [
+        {"en": "Good morning", "ph": "Gud mo-ning", "id": "Selamat pagi"},
+        {"en": "Good afternoon", "ph": "Gud af-ter-nun", "id": "Selamat siang"},
+        {"en": "Good evening", "ph": "Gud i-vning", "id": "Selamat malam"},
+        {"en": "Sir", "ph": "Ser", "id": "Tuan"},
+        {"en": "Madam", "ph": "Medem", "id": "Nyonya/Ibu"},
+        {"en": "How are you?", "ph": "Hau ar yu?", "id": "Apa kabar"},
+        {"en": "How can I help you?", "ph": "Hau ken ai help yu", "id": "Apa yang bisa saya bantu"},
+        {"en": "May I have your name?", "ph": "Mei ai hev yor neim", "id": "Boleh saya tahu nama anda?"},
+        {"en": "May I help with your luggage?", "ph": "Mei ai help wit yor lagij", "id": "Bolehkah saya membantu koper anda?"},
+        {"en": "Please follow me", "ph": "Plis folou mi", "id": "Silahkan ikuti saya"},
+        {"en": "Enjoy your stay", "ph": "Enjoi yor stei", "id": "Selamat menikmati masa menginap anda"},
+        {"en": "Nice to meet you", "ph": "Nais tu mit yu", "id": "Senang bertemu anda"},
+        {"en": "You’re welcome", "ph": "Yor welkom", "id": "Sama-sama"},
+        {"en": "My pleasure", "ph": "Mai plezur", "id": "Senang bisa membantu"},
     ],
-    "Buah": [
-        {"en": "apple", "id": "apel"},
-        {"en": "banana", "id": "pisang"},
-        {"en": "grape", "id": "anggur"},
+    "Topic 2a - Numbers": [
+        {"en": "one", "ph": "wan", "id": "1"},
+        {"en": "two", "ph": "twu", "id": "2"},
+        {"en": "three", "ph": "thri", "id": "3"},
+        {"en": "four", "ph": "for", "id": "4"},
+        {"en": "five", "ph": "faiv", "id": "5"},
+        {"en": "six", "ph": "siks", "id": "6"},
+        {"en": "seven", "ph": "seven", "id": "7"},
+        {"en": "eight", "ph": "eit", "id": "8"},
+        {"en": "nine", "ph": "nain", "id": "9"},
+        {"en": "ten", "ph": "ten", "id": "10"},
+        {"en": "eleven", "ph": "ilevn", "id": "11"},
+        {"en": "twelve", "ph": "twelv", "id": "12"},
+        {"en": "thirteen", "ph": "thertin", "id": "13"},
+        {"en": "fourteen", "ph": "forti:n", "id": "14"},
+        {"en": "fifteen", "ph": "fifti:n", "id": "15"},
+        {"en": "sixteen", "ph": "sixti:n", "id": "16"},
+        {"en": "seventeen", "ph": "seventi:n", "id": "17"},
+        {"en": "eighteen", "ph": "eiti:n", "id": "18"},
+        {"en": "nineteen", "ph": "nainti:n", "id": "19"},
+        {"en": "twenty", "ph": "twenti", "id": "20"},
     ],
-    "Transportasi": [
-        {"en": "car", "id": "mobil"},
-        {"en": "train", "id": "kereta"},
-        {"en": "bicycle", "id": "sepeda"},
-    ],
-    "Warna": [
-        {"en": "red", "id": "merah"},
-        {"en": "blue", "id": "biru"},
-        {"en": "green", "id": "hijau"},
-    ],
-    "Anggota Tubuh": [
-        {"en": "hand", "id": "tangan"},
-        {"en": "eye", "id": "mata"},
-        {"en": "leg", "id": "kaki"},
-    ],
-    "Pakaian": [
-        {"en": "shirt", "id": "baju"},
-        {"en": "pants", "id": "celana"},
-        {"en": "hat", "id": "topi"},
-    ],
-    "Sekolah": [
-        {"en": "book", "id": "buku"},
-        {"en": "pen", "id": "pena"},
-        {"en": "teacher", "id": "guru"},
-    ],
-    "Profesi": [
-        {"en": "doctor", "id": "dokter"},
-        {"en": "police", "id": "polisi"},
-        {"en": "farmer", "id": "petani"},
-    ],
-    "Olahraga": [
-        {"en": "soccer", "id": "sepak bola"},
-        {"en": "basketball", "id": "bola basket"},
-        {"en": "swimming", "id": "renang"},
-    ],
-    "Makanan": [
-        {"en": "rice", "id": "nasi"},
-        {"en": "bread", "id": "roti"},
-        {"en": "chicken", "id": "ayam"},
-    ],
-    "Minuman": [
-        {"en": "water", "id": "air"},
-        {"en": "milk", "id": "susu"},
-        {"en": "tea", "id": "teh"},
-    ],
-    "Keluarga": [
-        {"en": "father", "id": "ayah"},
-        {"en": "mother", "id": "ibu"},
-        {"en": "sister", "id": "saudara perempuan"},
-    ],
-    "Peralatan": [
-        {"en": "knife", "id": "pisau"},
-        {"en": "spoon", "id": "sendok"},
-        {"en": "chair", "id": "kursi"},
-    ],
-    "Arah": [
-        {"en": "left", "id": "kiri"},
-        {"en": "right", "id": "kanan"},
-        {"en": "straight", "id": "lurus"},
-    ],
-    "Waktu": [
-        {"en": "morning", "id": "pagi"},
-        {"en": "afternoon", "id": "siang"},
-        {"en": "night", "id": "malam"},
-    ],
-    "Cuaca": [
-        {"en": "rain", "id": "hujan"},
-        {"en": "sun", "id": "matahari"},
-        {"en": "cloud", "id": "awan"},
-    ],
+    # tambahkan Topic 2b, 2c, 2d, dst...
 }
 
 # ======================
@@ -96,7 +55,7 @@ topics = {
 # ======================
 topic_choice = st.sidebar.radio("📌 Pilih Topik", list(topics.keys()))
 
-st.subheader(f"📖 Topik: {topic_choice}")
+st.subheader(f"📖 {topic_choice}")
 
 # ======================
 # Tampilkan Vocabulary
@@ -105,9 +64,10 @@ vocab_list = topics[topic_choice]
 
 for vocab in vocab_list:
     en_word = vocab["en"]
+    ph_word = vocab["ph"]
     id_word = vocab["id"]
 
-    st.markdown(f"### {en_word.capitalize()} — *{id_word}*")
+    st.markdown(f"### {en_word} ({ph_word}) — *{id_word}*")
 
     components.html(
         f"""
@@ -117,7 +77,7 @@ for vocab in vocab_list:
             
             <!-- Tombol STT -->
             <button onclick="startRecognition('{en_word}')">🎙️ STT</button>
-            <span id="result_{en_word}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
+            <span id="result_{en_word.replace(" ", "_")}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
         </div>
 
         <script>
@@ -136,7 +96,7 @@ for vocab in vocab_list:
 
             recognition.onresult = function(event) {{
                 var transcript = event.results[0][0].transcript.toLowerCase();
-                var resultElem = document.getElementById("result_" + targetWord);
+                var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_"));
 
                 if (transcript.includes(targetWord.toLowerCase())) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
