@@ -26,7 +26,7 @@ topics = {
     {"english": "My pleasure", "phonetic": "Mai plezur", "indonesia": "Senang bisa membantu"}
 ],
     "Topic 2a - Numbers": [
-        {"english": "one|1", "phonetic": "wan", "indonesia": "1"},
+        {"english": "1", "phonetic": "wan", "indonesia": "1"},
         {"english": "two|2", "phonetic": "twu", "indonesia": "2"},
         {"english": "three|3", "phonetic": "thri", "indonesia": "3"},
         {"english": "four|4", "phonetic": "for", "indonesia": "4"},
