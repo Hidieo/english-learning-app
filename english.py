@@ -1,144 +1,153 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="English Learning App", layout="wide")
+st.set_page_config(page_title="Kamus Kosakata", layout="wide")
 
-st.title("🎤 English Learning App")
+st.title("📚 Kamus Kosakata Inggris-Indonesia — TTS & STT")
 
-# Kode HTML + JS dimasukkan ke dalam string
-html_code = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>English Learning App</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background: #f8f9fa; }
-    .topic-btn {
-      width: 100%;
-      margin: 5px 0;
-      font-size: 1rem;
-      font-weight: 500;
-      padding: 12px;
-      border-radius: 12px;
-      transition: all 0.3s ease;
-    }
-    .topic-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
-    }
-    #result {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 15px;
-      min-height: 120px;
-      margin-top: 15px;
-      box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-    }
-    .highlight {
-      color: green;
-      font-weight: bold;
-    }
-    footer {
-      margin-top: 30px;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #6c757d;
-    }
-  </style>
-</head>
-<body>
+# ======================
+# Daftar 16 Topik
+# ======================
+topics = {
+    "Hewan": [
+        {"en": "cat", "id": "kucing"},
+        {"en": "dog", "id": "anjing"},
+        {"en": "bird", "id": "burung"},
+    ],
+    "Buah": [
+        {"en": "apple", "id": "apel"},
+        {"en": "banana", "id": "pisang"},
+        {"en": "grape", "id": "anggur"},
+    ],
+    "Transportasi": [
+        {"en": "car", "id": "mobil"},
+        {"en": "train", "id": "kereta"},
+        {"en": "bicycle", "id": "sepeda"},
+    ],
+    "Warna": [
+        {"en": "red", "id": "merah"},
+        {"en": "blue", "id": "biru"},
+        {"en": "green", "id": "hijau"},
+    ],
+    "Anggota Tubuh": [
+        {"en": "hand", "id": "tangan"},
+        {"en": "eye", "id": "mata"},
+        {"en": "leg", "id": "kaki"},
+    ],
+    "Pakaian": [
+        {"en": "shirt", "id": "baju"},
+        {"en": "pants", "id": "celana"},
+        {"en": "hat", "id": "topi"},
+    ],
+    "Sekolah": [
+        {"en": "book", "id": "buku"},
+        {"en": "pen", "id": "pena"},
+        {"en": "teacher", "id": "guru"},
+    ],
+    "Profesi": [
+        {"en": "doctor", "id": "dokter"},
+        {"en": "police", "id": "polisi"},
+        {"en": "farmer", "id": "petani"},
+    ],
+    "Olahraga": [
+        {"en": "soccer", "id": "sepak bola"},
+        {"en": "basketball", "id": "bola basket"},
+        {"en": "swimming", "id": "renang"},
+    ],
+    "Makanan": [
+        {"en": "rice", "id": "nasi"},
+        {"en": "bread", "id": "roti"},
+        {"en": "chicken", "id": "ayam"},
+    ],
+    "Minuman": [
+        {"en": "water", "id": "air"},
+        {"en": "milk", "id": "susu"},
+        {"en": "tea", "id": "teh"},
+    ],
+    "Keluarga": [
+        {"en": "father", "id": "ayah"},
+        {"en": "mother", "id": "ibu"},
+        {"en": "sister", "id": "saudara perempuan"},
+    ],
+    "Peralatan": [
+        {"en": "knife", "id": "pisau"},
+        {"en": "spoon", "id": "sendok"},
+        {"en": "chair", "id": "kursi"},
+    ],
+    "Arah": [
+        {"en": "left", "id": "kiri"},
+        {"en": "right", "id": "kanan"},
+        {"en": "straight", "id": "lurus"},
+    ],
+    "Waktu": [
+        {"en": "morning", "id": "pagi"},
+        {"en": "afternoon", "id": "siang"},
+        {"en": "night", "id": "malam"},
+    ],
+    "Cuaca": [
+        {"en": "rain", "id": "hujan"},
+        {"en": "sun", "id": "matahari"},
+        {"en": "cloud", "id": "awan"},
+    ],
+}
 
-<div class="container py-4">
-  <h1 class="text-center mb-4">🎤 English Learning App</h1>
+# ======================
+# Menu pilih topik
+# ======================
+topic_choice = st.sidebar.radio("📌 Pilih Topik", list(topics.keys()))
 
-  <!-- Menu 16 Topic -->
-  <div class="row row-cols-2 row-cols-md-4 g-3">
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(1)">Topic 1: Greeting</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(2)">Topic 2: Numbers</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(3)">Topic 3: Hotel Jobs</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(4)">Topic 4: Directions</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(5)">Topic 5: Reservations</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(6)">Topic 6: Check-in/out</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(7)">Topic 7: Hotel Facilities</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(8)">Topic 8: Food & Drinks</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(9)">Topic 9</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(10)">Topic 10</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(11)">Topic 11</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(12)">Topic 12</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(13)">Topic 13</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(14)">Topic 14</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(15)">Topic 15</button></div>
-    <div class="col"><button class="btn btn-outline-primary topic-btn" onclick="setTopic(16)">Topic 16</button></div>
-  </div>
+st.subheader(f"📖 Topik: {topic_choice}")
 
-  <!-- Hasil Speech -->
-  <div id="result" class="mt-4">
-    <p class="text-muted">🎙️ Hasil ucapan Anda akan muncul di sini...</p>
-  </div>
+# ======================
+# Tampilkan Vocabulary
+# ======================
+vocab_list = topics[topic_choice]
 
-  <!-- Tombol Record -->
-  <div class="d-flex justify-content-center mt-3">
-    <button class="btn btn-success btn-lg px-4" onclick="startRecognition()">🎙️ Start Speaking</button>
-  </div>
+for vocab in vocab_list:
+    en_word = vocab["en"]
+    id_word = vocab["id"]
 
-  <footer>English Learning App © 2025</footer>
-</div>
+    st.markdown(f"### {en_word.capitalize()} — *{id_word}*")
 
-<script>
-  let vocabularySets = {
-    1: ["hello", "hi", "good morning", "good afternoon", "good evening", "how are you"],
-    2: ["one", "two", "three", "four", "five", "ten", "twenty"],
-    3: ["receptionist", "manager", "chef", "waiter", "bellboy"],
-    4: ["left", "right", "straight", "corner", "block"],
-    5: ["reservation", "booking", "confirm", "guest"],
-    6: ["check-in", "check-out", "room key", "passport"],
-    7: ["pool", "gym", "spa", "restaurant", "bar"],
-    8: ["breakfast", "lunch", "dinner", "coffee", "tea"]
-  };
+    components.html(
+        f"""
+        <div style="margin-bottom:15px;">
+            <!-- Tombol TTS -->
+            <button onclick="speakWord('{en_word}')">🔊 TTS</button>
+            
+            <!-- Tombol STT -->
+            <button onclick="startRecognition('{en_word}')">🎙️ STT</button>
+            <span id="result_{en_word}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
+        </div>
 
-  let currentTopic = 1;
+        <script>
+        // TTS
+        function speakWord(word) {{
+            var utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = "en-US";
+            speechSynthesis.speak(utterance);
+        }}
 
-  function setTopic(topic) {
-    currentTopic = topic;
-    document.getElementById("result").innerHTML = `<p class="text-primary">Topic ${topic} dipilih. Silakan bicara...</p>`;
-  }
+        // STT
+        function startRecognition(targetWord) {{
+            var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.start();
 
-  function highlightWords(text) {
-    let words = text.split(/\\s+/);
-    return words.map(w => {
-      let cleanWord = w.replace(/[.,!?;:]/g, "").toLowerCase();
-      if (vocabularySets[currentTopic]?.includes(cleanWord)) {
-        return `<span class="highlight">${w}</span>`;
-      } else {
-        return w;
-      }
-    }).join(" ");
-  }
+            recognition.onresult = function(event) {{
+                var transcript = event.results[0][0].transcript.toLowerCase();
+                var resultElem = document.getElementById("result_" + targetWord);
 
-  function startRecognition() {
-    if (!('webkitSpeechRecognition' in window)) {
-      alert("Browser tidak mendukung Speech Recognition!");
-      return;
-    }
-    let recognition = new webkitSpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.start();
-
-    recognition.onresult = function(event) {
-      let transcript = event.results[0][0].transcript;
-      document.getElementById("result").innerHTML = highlightWords(transcript);
-    };
-  }
-</script>
-</body>
-</html>
-"""
-
-# Tampilkan HTML di Streamlit
-components.html(html_code, height=800, scrolling=True)
+                if (transcript.includes(targetWord.toLowerCase())) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
+                }} else {{
+                    resultElem.innerHTML = "❌ Salah (" + transcript + ")";
+                    resultElem.style.color = "red";
+                }}
+            }};
+        }}
+        </script>
+        """,
+        height=80,
+    )
