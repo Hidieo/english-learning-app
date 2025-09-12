@@ -7,3 +7,4 @@ pydub
 streamlit
 streamlit_webrtc
 streamlit-audiorec
+streamlit-js-eval
