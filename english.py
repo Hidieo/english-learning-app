@@ -1,81 +1,67 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.title("🎙️ Live Speech-to-Text (Realtime Captions with Vocabulary Highlight)")
+st.set_page_config(page_title="Kamus Kosakata", layout="wide")
 
-# Daftar vocabulary target (bisa diganti sesuai kebutuhan)
-vocabulary = ["apple", "banana", "hello", "world", "computer"]
+st.title("📚 Kamus Kosakata Inggris-Indonesia — TTS & STT")
 
-# Ubah list Python ke JavaScript array
-vocab_js = str(vocabulary).replace("'", '"')
+# Daftar vocabulary (bisa diganti sesuai kebutuhan)
+vocab_list = [
+    {"en": "cat", "id": "kucing"},
+    {"en": "dog", "id": "anjing"},
+    {"en": "apple", "id": "apel"},
+    {"en": "banana", "id": "pisang"}
+]
 
-components.html(
-    f"""
-    <script>
-    var recognizing;
-    var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
+# Konversi ke JS
+vocab_js = str([v["en"] for v in vocab_list]).replace("'", '"')
 
-    var vocabulary = {vocab_js}; // daftar vocabulary dari Python
+# Render UI
+for vocab in vocab_list:
+    en_word = vocab["en"]
+    id_word = vocab["id"]
 
-    recognition.onstart = function() {{
-        document.getElementById('status').innerHTML = "🎤 Listening...";
-    }};
+    st.markdown(f"### {en_word.capitalize()} — *{id_word}*")
 
-    recognition.onend = function() {{
-        document.getElementById('status').innerHTML = "🛑 Stopped";
-    }};
+    components.html(
+        f"""
+        <div style="margin-bottom:15px;">
+            <!-- Tombol TTS -->
+            <button onclick="speakWord('{en_word}')">🔊 TTS</button>
+            
+            <!-- Tombol STT -->
+            <button onclick="startRecognition('{en_word}')">🎙️ STT</button>
+            <span id="result_{en_word}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
+        </div>
 
-    recognition.onresult = function(event) {{
-        var interim_transcript = '';
-        var final_transcript = '';
-        for (var i = event.resultIndex; i < event.results.length; ++i) {{
-            if (event.results[i].isFinal) {{
-                final_transcript += event.results[i][0].transcript + " ";
-            }} else {{
-                interim_transcript += event.results[i][0].transcript + " ";
-            }}
+        <script>
+        // TTS
+        function speakWord(word) {{
+            var utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = "en-US";
+            speechSynthesis.speak(utterance);
         }}
 
-        // Highlight vocabulary
-        final_transcript = highlightWords(final_transcript);
-        interim_transcript = highlightWords(interim_transcript);
+        // STT
+        function startRecognition(targetWord) {{
+            var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.start();
 
-        document.getElementById('final').innerHTML = final_transcript;
-        document.getElementById('interim').innerHTML = interim_transcript;
-    }};
+            recognition.onresult = function(event) {{
+                var transcript = event.results[0][0].transcript.toLowerCase();
+                var resultElem = document.getElementById("result_" + targetWord);
 
-    function highlightWords(text) {{
-        let words = text.split(/\\s+/);
-        return words.map(w => {{
-            // Hapus tanda baca dan ubah lowercase untuk perbandingan
-            let cleanWord = w.replace(/[.,!?;:]/g, "").toLowerCase();
-            
-            if (vocabulary.includes(cleanWord)) {{
-                return "<span style='color:green; font-weight:bold;'>" + w + "</span>";
-            }} else {{
-                return w;
-            }}
-        }}).join(" ");
-    }}
-
-    function startButton() {{
-        recognition.start();
-    }}
-    function stopButton() {{
-        recognition.stop();
-    }}
-    </script>
-
-    <button onclick="startButton()">▶️ Start</button>
-    <button onclick="stopButton()">⏹ Stop</button>
-    <p id="status">Not Listening</p>
-    <h3>Final:</h3>
-    <div id="final" style="font-size:18px;"></div>
-    <h3>Interim:</h3>
-    <div id="interim" style="font-size:16px; color:gray;"></div>
-    """,
-    height=450,
-)
+                if (transcript.includes(targetWord.toLowerCase())) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
+                }} else {{
+                    resultElem.innerHTML = "❌ Salah (" + transcript + ")";
+                    resultElem.style.color = "red";
+                }}
+            }};
+        }}
+        </script>
+        """,
+        height=80,
+    )
