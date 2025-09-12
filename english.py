@@ -618,66 +618,45 @@ for vocab in vocab_list:
 
     st.markdown(f"### {en_word} ({ph_word}) — *{id_word}*")
 
-components.html(
-    f"""
-    <div style="margin-bottom:15px;">
-        <!-- Tombol TTS -->
-        <button onclick="speakWord('{en_word.split('|')[0]}')">🔊 Pronounce</button>
-        
-        <!-- Tombol STT -->
-        <button onclick="startRecognition('{en_word}')">🎙️ Tes Speaking</button>
-        
-        <span id="result_{en_word.split('|')[0].replace(" ", "_")}" 
-              style="margin-left:10px; font-weight:bold; color:gray;"></span>
-    </div>
-    
-    <script>
-    // ==============================
-    // TTS
-    // ==============================
-    function speakWord(word) {{
-        var utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = "en-US";
-        speechSynthesis.speak(utterance);
-    }}
+    components.html(
+        f"""
+        <div style="margin-bottom:15px;">
+            <!-- Tombol TTS -->
+            <button onclick="speakWord('{en_word}')">🔊 TTS</button>
+            
+            <!-- Tombol STT -->
+            <button onclick="startRecognition('{en_word}')">🎙️ STT</button>
+            <span id="result_{en_word.replace(" ", "_")}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
+        </div>
 
-    // ==============================
-    // Normalisasi (biarkan huruf + angka, hapus simbol lain)
-    // ==============================
-    function normalize(text) {{
-        return text.toLowerCase()
-                   .replace(/’/g, "'")
-                   .replace(/[^a-z0-9\\s]/g, "")  // biarkan huruf a-z dan angka 0-9
-                   .trim();
-    }}
+        <script>
+        // TTS
+        function speakWord(word) {{
+            var utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = "en-US";
+            speechSynthesis.speak(utterance);
+        }}
 
-    // ==============================
-    // STT
-    // ==============================
-    function startRecognition(targetWord) {{
-        var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = "en-US";
-        recognition.start();
+        // STT
+        function startRecognition(targetWord) {{
+            var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.start();
 
-        recognition.onresult = function(event) {{
-            var transcript = event.results[0][0].transcript;
-            var resultElem = document.getElementById(
-                "result_" + targetWord.split("|")[0].replace(/ /g, "_")
-            );
+            recognition.onresult = function(event) {{
+                var transcript = event.results[0][0].transcript.toLowerCase();
+                var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_"));
 
-            var normalizedTranscript = normalize(transcript);
-            var normalizedTargets = targetWord.split("|").map(t => normalize(t));
-
-            if (normalizedTargets.includes(normalizedTranscript)) {{
-                resultElem.innerHTML = "✅ Benar (" + transcript + ")";
-                resultElem.style.color = "green";
-            }} else {{
-                resultElem.innerHTML = "❌ Salah (" + transcript + ")";
-                resultElem.style.color = "red";
-            }}
-        }};
-    }}
-    </script>
-    """,
-    height=110,
-)
+                if (transcript.includes(targetWord.toLowerCase())) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
+                }} else {{
+                    resultElem.innerHTML = "❌ Salah (" + transcript + ")";
+                    resultElem.style.color = "red";
+                }}
+            }};
+        }}
+        </script>
+        """,
+        height=80,
+    )
