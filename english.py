@@ -1,8 +1,13 @@
 import streamlit as st
-import streamlit.components.v1 as components
-from streamlit_js_eval import streamlit_js_eval
+from streamlit_webrtc import webrtc_streamer
+import speech_recognition as sr
+import av
+import threading
+import numpy as np
 
-# Contoh data kosakata
+# ==============================
+# 1. Data kosakata
+# ==============================
 vocab_data = {
     "Greeting And Introduction": [
         {"kata": "hello"},
@@ -16,69 +21,70 @@ vocab_data = {
     ]
 }
 
-# Kumpulkan semua kata untuk dicek
 vocab_words = [v["kata"].lower() for topic in vocab_data.values() for v in topic]
 
+# ==============================
+# 2. Variabel global
+# ==============================
+transcript = []
+recognizer = sr.Recognizer()
+lock = threading.Lock()
 
-st.title("🎙️ Live Speech-to-Text with Vocabulary Matching")
+# ==============================
+# 3. Audio processing callback
+# ==============================
+def process_audio(frame: av.AudioFrame):
+    audio = frame.to_ndarray()
+    sample_rate = frame.sample_rate
 
-# Komponen HTML untuk Web Speech API
-components.html(
-    """
-    <script>
-    var recognizing;
-    var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
+    # Ambil channel pertama kalau stereo
+    if audio.ndim > 1:
+        audio = audio[:, 0]
 
-    recognition.onresult = function(event) {
-        var interim_transcript = '';
-        var final_transcript = '';
-        for (var i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                final_transcript += event.results[i][0].transcript;
-            } else {
-                interim_transcript += event.results[i][0].transcript;
-            }
-        }
-        // Kirim hasil final ke Python
-        const streamlitDoc = window.parent.document;
-        const input = streamlitDoc.querySelector('textarea[data-testid="stTextInput-input"]');
-        if (input) {
-            input.value = final_transcript;
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    };
+    # Convert ke PCM 16-bit
+    audio_bytes = audio.astype(np.int16).tobytes()
+    audio_data = sr.AudioData(audio_bytes, sample_rate, 2)
 
-    function startButton() {
-        recognition.start();
-    }
-    function stopButton() {
-        recognition.stop();
-    }
-    </script>
+    try:
+        text = recognizer.recognize_google(audio_data, language="en-US")
+        with lock:
+            transcript.append(text)
+    except sr.UnknownValueError:
+        pass
 
-    <button onclick="startButton()">▶️ Start</button>
-    <button onclick="stopButton()">⏹ Stop</button>
-    """,
-    height=150,
+# ==============================
+# 4. UI Streamlit
+# ==============================
+st.title("🎤 Live Caption + Vocabulary Highlight")
+
+webrtc_streamer(
+    key="speech-to-text",
+    mode="sendonly",   # mic -> server
+    audio_frame_callback=process_audio,
+    media_stream_constraints={"audio": True, "video": False},
 )
 
-# Input tersembunyi buat menampung hasil transkrip
-transcript = st.text_input("Hidden transcript", key="speech_text")
+# Tempat menampilkan hasil transkrip
+output_area = st.empty()
 
-if transcript:
-    st.markdown(f"📝 Teks terdeteksi: **{transcript}**")
+# Update UI
+def render_transcript():
+    with lock:
+        displayed_text = []
+        for text in transcript[-10:]:  # tampilkan 10 terakhir
+            words = text.split()
+            highlighted = []
+            for w in words:
+                if w.lower() in vocab_words:
+                    highlighted.append(
+                        f"<span style='color:lime;font-weight:bold'>{w}</span>"
+                    )
+                else:
+                    highlighted.append(w)
+            displayed_text.append(" ".join(highlighted))
 
-    words = transcript.lower().split()
-    matched = [w for w in words if w in vocab_words]
+        if displayed_text:
+            output_area.markdown("<br>".join(displayed_text), unsafe_allow_html=True)
 
-    if matched:
-        for w in words:
-            if w in matched:
-                st.markdown(f"<span style='color:green; font-weight:bold'>{w}</span>", unsafe_allow_html=True)
-            else:
-                st.markdown(w, unsafe_allow_html=True)
-    else:
-        st.warning("❌ Tidak ada kata yang cocok dengan kosakata.")
+# Jalankan render secara berkala
+render_transcript()
