@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 st.title("🎙️ Live Speech-to-Text (Realtime Captions with Vocabulary Highlight)")
 
-# Daftar vocabulary target
+# Daftar vocabulary target (bisa diganti sesuai kebutuhan)
 vocabulary = ["apple", "banana", "hello", "world", "computer"]
 
 # Ubah list Python ke JavaScript array
@@ -50,7 +50,10 @@ components.html(
     function highlightWords(text) {{
         let words = text.split(/\\s+/);
         return words.map(w => {{
-            if (vocabulary.includes(w.toLowerCase())) {{
+            // Hapus tanda baca dan ubah lowercase untuk perbandingan
+            let cleanWord = w.replace(/[.,!?;:]/g, "").toLowerCase();
+            
+            if (vocabulary.includes(cleanWord)) {{
                 return "<span style='color:green; font-weight:bold;'>" + w + "</span>";
             }} else {{
                 return w;
