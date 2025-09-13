@@ -684,6 +684,17 @@ for vocab in vocab_list:
                 "2:30": ["2.30", "Two thirty", "half past two", "A half past two", "2:30"],
                 "2:45": ["2.45", "Two forty five", "quarter to three", "A quarter to three", "2:45"]
             }};
+            var textTimeMap = {{
+                "two fifteen": "2:15",
+                "quarter past two": "2:15",
+                "a quarter past two": "2:15",
+                "two thirty": "2:30",
+                "half past two": "2:30",
+                "a half past two": "2:30",
+                "two forty five": "2:45",
+                "quarter to three": "2:45",
+                "a quarter to three": "2:45"
+            }};
         
             var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = "en-US";
@@ -735,6 +746,10 @@ for vocab in vocab_list:
                         resultElem.innerHTML = "❌ Salah (" + transcript + ")";
                         resultElem.style.color = "red";
                     }}
+                }}
+                else if (textTimeMap[normalizedTranscript] === normalizedTarget) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
                 }}
                 else {{
                     resultElem.innerHTML = "❌ Salah (" + transcript + ")";
