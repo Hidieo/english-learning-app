@@ -683,7 +683,6 @@ for vocab in vocab_list:
                 "2:15": ["2.15", "two fifteen", "quarter past two", "a quarter past two", "2:15"],
                 "2:30": ["2.30", "two thirty", "half past two", "a half past two", "2:30"],
                 "2:45": ["2.45", "two forty five", "quarter to three", "a quarter to three", "2:45"]
-                "two forty five": ["two forty five", "quarter to three", "a quarter to three", "2:45", "2.45"]
             }};
             var textTimeMap = {{
                 "two fifteen": "2:15",
