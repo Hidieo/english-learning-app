@@ -105,7 +105,7 @@ topics = {
         {"english": "closing time", "phonetic": "klosing taim", "indonesia": "jam tutup"},
         {"english": "check in time", "phonetic": "check-in taim", "indonesia": "waktu check-in (masuk)"},
         {"english": "check out time", "phonetic": "check-aut taim", "indonesia": "waktu check-out (keluar)"},
-        {"english": "1 O'clock", "phonetic": "wan o'klok", "indonesia": "jam 1"},
+        {"english": "1 Oclock", "phonetic": "wan o'klok", "indonesia": "jam 1"},
         {"english": "2:15", "phonetic": "twu fiftin", "indonesia": "jam 2 lewat 15"},
         {"english": "Two fifteen", "phonetic": "e kwar-ter pas twu", "indonesia": "jam 2 lewat 15"},
         {"english": "A quarter past two", "phonetic": "e kwar-ter pas twu", "indonesia": "jam 2 lewat 15"},
@@ -679,7 +679,7 @@ for vocab in vocab_list:
                 "20th": "twentieth"
             }};
             var timeMap = {{
-                "1 o'clock": ["1 o'clock", "one o'clock", "1", "one"],
+                "1 oclock": ["1 o'clock", "one o'clock", "1", "one"],
                 "2.15": ["2.15", "two fifteen", "quarter past two", "a quarter past two", "2:15"],
                 "2.30": ["2.30", "two thirty", "half past two", "a half past two", "2:30"],
                 "2.45": ["2.45", "two forty five", "quarter to three", "a quarter to three", "2:45"]
