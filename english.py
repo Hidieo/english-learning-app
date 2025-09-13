@@ -747,7 +747,7 @@ for vocab in vocab_list:
                         resultElem.style.color = "red";
                     }}
                 }}
-                else if (Object.keys(textTimeMap).find(key => textTimeMap[key] === normalizedTarget) === normalizedTranscript) {{
+                else if (Object.keys(timeMap).find(key => timeMap[key] === normalizedTarget) === normalizedTranscript) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
                 }}
