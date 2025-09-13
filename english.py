@@ -685,15 +685,15 @@ for vocab in vocab_list:
                 "2:45": ["2.45", "Two forty five", "quarter to three", "A quarter to three", "2:45"]
             }};
             var textTimeMap = {{
-                "two fifteen": "2:15",
+                "Two fifteen": "2:15",
                 "quarter past two": "2:15",
-                "a quarter past two": "2:15",
-                "two thirty": "2:30",
+                "A quarter past two": "2:15",
+                "Two thirty": "2:30",
                 "half past two": "2:30",
-                "a half past two": "2:30",
-                "two forty five": "2:45",
+                "A half past two": "2:30",
+                "Two forty five": "2:45",
                 "quarter to three": "2:45",
-                "a quarter to three": "2:45"
+                "A quarter to three": "2:45"
             }};
         
             var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
