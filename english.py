@@ -680,9 +680,9 @@ for vocab in vocab_list:
             }};
             var timeMap = {{
                 "1 oclock": ["1 o'clock", "one o'clock", "1:00"],
-                "2:15": ["2.15", "two fifteen", "quarter past two", "A quarter past two", "2:15"],
-                "2:30": ["2.30", "two thirty", "half past two", "A half past two", "2:30"],
-                "2:45": ["2.45", "two forty five", "quarter to three", "A quarter to three", "2:45"]
+                "2:15": ["2.15", "Two fifteen", "quarter past two", "A quarter past two", "2:15"],
+                "2:30": ["2.30", "Two thirty", "half past two", "A half past two", "2:30"],
+                "2:45": ["2.45", "Two forty five", "quarter to three", "A quarter to three", "2:45"]
             }};
         
             var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
