@@ -643,7 +643,6 @@ for vocab in vocab_list:
 
         function normalize(text) {{
             return text.toLowerCase()
-                       .replace(/’/g, "'")
                        .replace(/[^a-zA-Z\s]/g, "")
                        .trim();
         }}
