@@ -650,21 +650,48 @@ for vocab in vocab_list:
 
         // STT
         function startRecognition(targetWord) {{
+            var numberMap = {{
+                "1": "one", "2": "two", "3": "three", "4": "four", "5": "five",
+                "6": "six", "7": "seven", "8": "eight", "9": "nine", "10": "ten",
+                "11": "eleven", "12": "twelve", "13": "thirteen", "14": "fourteen",
+                "15": "fifteen", "16": "sixteen", "17": "seventeen", "18": "eighteen",
+                "19": "nineteen", "20": "twenty"
+            }};
+        
             var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = "en-US";
             recognition.start();
-
+        
             recognition.onresult = function(event) {{
                 var transcript = event.results[0][0].transcript.toLowerCase();
                 var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_"));
-
+        
+                function normalize(text) {{
+                    return text.toLowerCase()
+                               .replace(/’/g, "'")
+                               .replace(/[^a-zA-Z0-9\s]/g, "")
+                               .trim();
+                }}
+        
                 var normalizedTranscript = normalize(transcript);
                 var normalizedTarget = normalize(targetWord);
-                
-                if (normalizedTranscript===normalizedTarget) {{
+        
+                // Cek jika target adalah angka, bandingkan dengan kata
+                if (numberMap[normalizedTarget] && normalizedTranscript === numberMap[normalizedTarget]) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
-                }} else {{
+                }}
+                // Cek jika target adalah kata, bandingkan dengan angka juga
+                else if (Object.keys(numberMap).find(key => numberMap[key] === normalizedTarget) === normalizedTranscript) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
+                }}
+                // Cek normal (sama persis)
+                else if (normalizedTranscript === normalizedTarget) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
+                }}
+                else {{
                     resultElem.innerHTML = "❌ Salah (" + transcript + ")";
                     resultElem.style.color = "red";
                 }}
