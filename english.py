@@ -103,8 +103,8 @@ topics = {
         {"english": "midday", "phonetic": "mid-dei", "indonesia": "tengah hari"},
         {"english": "opening hours", "phonetic": "opening awers", "indonesia": "jam buka"},
         {"english": "closing time", "phonetic": "klosing taim", "indonesia": "jam tutup"},
-        {"english": "check-in time", "phonetic": "check-in taim", "indonesia": "waktu check-in (masuk)"},
-        {"english": "check-out time", "phonetic": "check-aut taim", "indonesia": "waktu check-out (keluar)"},
+        {"english": "check in time", "phonetic": "check-in taim", "indonesia": "waktu check-in (masuk)"},
+        {"english": "check out time", "phonetic": "check-aut taim", "indonesia": "waktu check-out (keluar)"},
         {"english": "1 O'clock", "phonetic": "wan o'klok", "indonesia": "jam 1"},
         {"english": "2.15", "phonetic": "twu fiftin", "indonesia": "jam 2 lewat 15"},
         {"english": "Two fifteen", "phonetic": "e kwar-ter pas twu", "indonesia": "jam 2 lewat 15"},
@@ -251,8 +251,8 @@ topics = {
         {"english": "Thank you for staying", "phonetic": "Thenk-yu for stei-ing", "indonesia": "Terima kasih telah menginap"},
         {"english": "Check in time", "phonetic": "Cek-in taim", "indonesia": "Waktu check-in"},
         {"english": "Check out time", "phonetic": "Cek-aut taim", "indonesia": "Waktu check-out"},
-        {"english": "Early check-in", "phonetic": "Er-li cek-in", "indonesia": "Check-in lebih awal"},
-        {"english": "Late check-out", "phonetic": "Leit cek-aut", "indonesia": "Check-out lebih lambat"},
+        {"english": "Early check in", "phonetic": "Er-li cek-in", "indonesia": "Check-in lebih awal"},
+        {"english": "Late check out", "phonetic": "Leit cek-aut", "indonesia": "Check-out lebih lambat"},
         {"english": "Luggage", "phonetic": "Lag-gej", "indonesia": "Bagasi"},
         {"english": "Bellboy", "phonetic": "Bel-boi", "indonesia": "Petugas pengantar barang"},
         {"english": "Concierge", "phonetic": "Kon-si-erj", "indonesia": "Petugas layanan tamu"},
@@ -302,7 +302,7 @@ topics = {
         {"english": "Elegant", "phonetic": "elegan", "indonesia": "Elegan"},
         {"english": "Cozy", "phonetic": "Kou-zi", "indonesia": "Hangat dan nyaman"},
         {"english": "Clean", "phonetic": "klin", "indonesia": "Bersih"},
-        {"english": "Well-equipped", "phonetic": "Wel-i-kwip", "indonesia": "Dilengkapi dengan baik"},
+        {"english": "Well equipped", "phonetic": "Wel-i-kwip", "indonesia": "Dilengkapi dengan baik"},
         {"english": "Convenient", "phonetic": "Kon-vini-en", "indonesia": "Praktis/mudah diakses"},
         {"english": "Private", "phonetic": "Prai-vet", "indonesia": "Pribadi"},
         {"english": "Quiet", "phonetic": "Kwai-et", "indonesia": "Tenang"},
@@ -344,7 +344,7 @@ topics = {
         {"english": "Bill", "phonetic": "bil", "indonesia": "Tagihan"},
         {"english": "Tip", "phonetic": "tip", "indonesia": "Uang tip"},
         {"english": "Table setting", "phonetic": "tey-bel se-ting", "indonesia": "Tata meja"},
-        {"english": "Reservation (table)", "phonetic": "rezervesyen teybel", "indonesia": "Reservasi meja"},
+        {"english": "Reservation", "phonetic": "rezervesyen teybel", "indonesia": "Reservasi meja"},
         {"english": "Occupied table", "phonetic": "o-kyu-pai-d te-bel", "indonesia": "Meja terisi"},
         {"english": "Available table", "phonetic": "e-vei-le-bel te-bel", "indonesia": "Meja tersedia"},
         {"english": "Napkin", "phonetic": "nep-kin", "indonesia": "Serbet"},
@@ -520,7 +520,7 @@ topics = {
         {"english": "Dial", "phonetic": "dai-el", "indonesia": "Memutar nomor telepon"},
         {"english": "Pick up", "phonetic": "pik ap", "indonesia": "Mengangkat telepon"},
         {"english": "Hang up", "phonetic": "heng ap", "indonesia": "Menutup telepon"},
-        {"english": "Long-distance call", "phonetic": "long dis-tens kol", "indonesia": "Telepon jarak jauh"},
+        {"english": "Long distance call", "phonetic": "long dis-tens kol", "indonesia": "Telepon jarak jauh"},
         {"english": "Collect call", "phonetic": "ko-lekt kol", "indonesia": "Telepon dibayar penerima"},
         {"english": "International call", "phonetic": "in-ter-na-sye-nel kol", "indonesia": "Telepon internasional"},
         {"english": "Wrong number", "phonetic": "rong nam-ber", "indonesia": "Nomor salah"},
@@ -657,6 +657,34 @@ for vocab in vocab_list:
                 "15": "fifteen", "16": "sixteen", "17": "seventeen", "18": "eighteen",
                 "19": "nineteen", "20": "twenty"
             }};
+            var ordinalMap = {{
+                "1st": "first",
+                "2nd": "second",
+                "3rd": "third",
+                "4th": "fourth",
+                "5th": "fifth",
+                "6th": "sixth",
+                "7th": "seventh",
+                "8th": "eighth",
+                "9th": "ninth",
+                "10th": "tenth",
+                "11th": "eleventh",
+                "12th": "twelfth",
+                "13th": "thirteenth",
+                "14th": "fourteenth",
+                "15th": "fifteenth",
+                "16th": "sixteenth",
+                "17th": "seventeenth",
+                "18th": "eighteenth",
+                "19th": "nineteenth",
+                "20th": "twentieth"
+            }};
+            var timeMap = {{
+                "1 o'clock": ["1 o'clock", "one o'clock", "1", "one"],
+                "2.15": ["2.15", "two fifteen", "quarter past two", "a quarter past two", "2:15"],
+                "2.30": ["2.30", "two thirty", "half past two", "a half past two", "2:30"],
+                "2.45": ["2.45", "two forty five", "quarter to three", "a quarter to three", "2:45"]
+            }};
         
             var recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = "en-US";
@@ -668,7 +696,6 @@ for vocab in vocab_list:
         
                 function normalize(text) {{
                     return text.toLowerCase()
-                               .replace(/’/g, "'")
                                .replace(/[^a-zA-Z0-9\s]/g, "")
                                .trim();
                 }}
@@ -690,6 +717,25 @@ for vocab in vocab_list:
                 else if (normalizedTranscript === normalizedTarget) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
+                }}
+                else if (ordinalMap[normalizedTarget] && normalizedTranscript === ordinalMap[normalizedTarget]) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
+                }}
+                // Cek jika target adalah kata ordinal, bandingkan dengan angka
+                else if (Object.keys(ordinalMap).find(key => ordinalMap[key] === normalizedTarget) === normalizedTranscript) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
+                }}
+                else if (timeMap[normalizedTarget]) {{
+                    var validWords = timeMap[normalizedTarget].map(normalize);
+                    if (validWords.includes(normalizedTranscript)) {{
+                        resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                        resultElem.style.color = "green";
+                    }} else {{
+                        resultElem.innerHTML = "❌ Salah (" + transcript + ")";
+                        resultElem.style.color = "red";
+                    }}
                 }}
                 else {{
                     resultElem.innerHTML = "❌ Salah (" + transcript + ")";
