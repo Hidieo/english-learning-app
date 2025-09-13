@@ -630,7 +630,7 @@ for vocab in vocab_list:
             
             <!-- Tombol STT -->
             <button onclick="startRecognition('{safe_word}')">🎙️ Test Speaking</button>
-            <span id="result_{en_word.replace(" ", "_")}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
+            <span id="result_{en_word.replace(" ", "_").replace("'", "")}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
         </div>
 
         <script>
@@ -691,7 +691,7 @@ for vocab in vocab_list:
         
             recognition.onresult = function(event) {{
                 var transcript = event.results[0][0].transcript.toLowerCase();
-                var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_"));
+                var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_").replace(/'/g,""));
         
                 function normalize(text) {{
                     return text.toLowerCase()
