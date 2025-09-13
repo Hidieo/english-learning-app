@@ -703,18 +703,27 @@ for vocab in vocab_list:
             recognition.onresult = function(event) {{
                 var transcript = event.results[0][0].transcript.toLowerCase();
                 var resultElem = document.getElementById("result_" + targetWord.replace(/ /g,"_").replace(/'/g,""));
-        
+            
                 function normalize(text) {{
                     return text.toLowerCase()
-                               .replace(/[^a-zA-Z0-9\s]/g, "")
+                               .replace(/[^a-zA-Z0-9\s:]/g, "")
                                .trim();
                 }}
-        
+            
                 var normalizedTranscript = normalize(transcript);
                 var normalizedTarget = normalize(targetWord);
-        
+            
+                // Standarisasi ke format waktu (2:15, 2:30, dst.)
+                var transcriptTime = textTimeMap[normalizedTranscript] || normalizedTranscript;
+                var targetTime = textTimeMap[normalizedTarget] || normalizedTarget;
+            
+                // 🔥 Pengecekan waktu duluan
+                if (transcriptTime === targetTime) {{
+                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
+                    resultElem.style.color = "green";
+                }}
                 // Cek jika target adalah angka, bandingkan dengan kata
-                if (numberMap[normalizedTarget] && normalizedTranscript === numberMap[normalizedTarget]) {{
+                else if (numberMap[normalizedTarget] && normalizedTranscript === numberMap[normalizedTarget]) {{
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
                 }}
@@ -737,6 +746,7 @@ for vocab in vocab_list:
                     resultElem.innerHTML = "✅ Benar (" + transcript + ")";
                     resultElem.style.color = "green";
                 }}
+                // Cek timeMap langsung (alias variasi ejaan)
                 else if (timeMap[normalizedTarget]) {{
                     var validWords = timeMap[normalizedTarget].map(normalize);
                     if (validWords.includes(normalizedTranscript)) {{
@@ -747,16 +757,11 @@ for vocab in vocab_list:
                         resultElem.style.color = "red";
                     }}
                 }}
-                else if (textTimeMap[normalizedTranscript] && textTimeMap[normalizedTranscript] === normalizedTarget) {{
-                    resultElem.innerHTML = "✅ Benar (" + transcript + ")";
-                    resultElem.style.color = "green";
-                }}
                 else {{
                     resultElem.innerHTML = "❌ Salah (" + transcript + ")";
                     resultElem.style.color = "red";
                 }}
             }};
-        }}
         </script>
         """,
         height=80,
