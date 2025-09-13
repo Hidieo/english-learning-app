@@ -107,7 +107,7 @@ topics = {
         {"english": "check out time", "phonetic": "check-aut taim", "indonesia": "waktu check-out (keluar)"},
         {"english": "1 Oclock", "phonetic": "wan o'klok", "indonesia": "jam 1"},
         {"english": "2:15", "phonetic": "twu fiftin", "indonesia": "jam 2 lewat 15"},
-        {"english": "Two fifteen", "phonetic": "e kwar-ter pas twu", "indonesia": "jam 2 lewat 15"},
+        {"english": "Two fifteen", "phonetic": "twu fiftin", "indonesia": "jam 2 lewat 15"},
         {"english": "A quarter past two", "phonetic": "e kwar-ter pas twu", "indonesia": "jam 2 lewat 15"},
         {"english": "Two thirty", "phonetic": "twu ther-ti", "indonesia": "jam 2.30"},
         {"english": "A half past two", "phonetic": "e half past twu", "indonesia": "jam 2.30"},
