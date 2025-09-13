@@ -621,7 +621,7 @@ for vocab in vocab_list:
     id_word = vocab["indonesia"]
 
     st.markdown(f"### {en_word} ({ph_word}) — *{id_word}*")
-    safe_word = en_word.replace('"', '&quot;')
+    safe_word = en_word.replace("'", "\\'")
     components.html(
         f"""
         <div style="margin-bottom:15px;">
