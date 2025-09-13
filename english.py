@@ -106,7 +106,7 @@ topics = {
         {"english": "check in time", "phonetic": "check-in taim", "indonesia": "waktu check-in (masuk)"},
         {"english": "check out time", "phonetic": "check-aut taim", "indonesia": "waktu check-out (keluar)"},
         {"english": "1 O'clock", "phonetic": "wan o'klok", "indonesia": "jam 1"},
-        {"english": "2.15", "phonetic": "twu fiftin", "indonesia": "jam 2 lewat 15"},
+        {"english": "2:15", "phonetic": "twu fiftin", "indonesia": "jam 2 lewat 15"},
         {"english": "Two fifteen", "phonetic": "e kwar-ter pas twu", "indonesia": "jam 2 lewat 15"},
         {"english": "A quarter past two", "phonetic": "e kwar-ter pas twu", "indonesia": "jam 2 lewat 15"},
         {"english": "Two thirty", "phonetic": "twu ther-ti", "indonesia": "jam 2.30"},
@@ -626,10 +626,10 @@ for vocab in vocab_list:
         f"""
         <div style="margin-bottom:15px;">
             <!-- Tombol TTS -->
-            <button onclick="speakWord('{en_word}')">🔊 Pronounce</button>
+            <button onclick="speakWord('{safe_word}')">🔊 Pronounce</button>
             
             <!-- Tombol STT -->
-            <button onclick="startRecognition('{en_word}')">🎙️ Test Speaking</button>
+            <button onclick="startRecognition('{safe_word}')">🎙️ Test Speaking</button>
             <span id="result_{en_word.replace(" ", "_")}" style="margin-left:10px; font-weight:bold; color:gray;"></span>
         </div>
 
