@@ -680,7 +680,7 @@ for vocab in vocab_list:
             }};
             var timeMap = {{
                 "1 oclock": ["1 o'clock", "one o'clock", "1:00"],
-                "215": ["2.15", "two fifteen", "quarter past two", "a quarter past two", "2:15"],
+                "2:15": ["2.15", "two fifteen", "quarter past two", "a quarter past two", "2:15", "215"],
                 "2:30": ["2.30", "two thirty", "half past two", "a half past two", "2:30"],
                 "2:45": ["2.45", "two forty five", "quarter to three", "a quarter to three", "2:45"]
             }};
