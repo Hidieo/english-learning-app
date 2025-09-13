@@ -93,7 +93,7 @@ topics = {
         {"english": "December", "phonetic": "di-sembe", "indonesia": "Desember"},
     ],
     "Topic 2e - Time Expressions": [
-        {"english": "o'clock", "phonetic": "o'klok", "indonesia": "tepat dari jam 12 malam sampai 12 siang"},
+        {"english": "o clock", "phonetic": "o'klok", "indonesia": "tepat dari jam 12 malam sampai 12 siang"},
         {"english": "a.m.", "phonetic": "ei-em", "indonesia": "jam 12 malam ke jam 12 siang"},
         {"english": "p.m.", "phonetic": "pi-em", "indonesia": "jam 12 siang ke jam 12 malam"},
         {"english": "quarter past", "phonetic": "kwar-ter pas", "indonesia": "lewat 15 menit"},
