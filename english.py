@@ -93,7 +93,7 @@ topics = {
         {"english": "December", "phonetic": "di-sembe", "indonesia": "Desember"},
     ],
     "Topic 2e - Time Expressions": [
-        {"english": "o'clock", "phonetic": "o'klok", "indonesia": "tepat dari jam 12 malam sampai 12 siang"},
+        {"english": "oclock", "phonetic": "o'klok", "indonesia": "tepat dari jam 12 malam sampai 12 siang"},
         {"english": "a.m.", "phonetic": "ei-em", "indonesia": "jam 12 malam ke jam 12 siang"},
         {"english": "p.m.", "phonetic": "pi-em", "indonesia": "jam 12 siang ke jam 12 malam"},
         {"english": "quarter past", "phonetic": "kwar-ter pas", "indonesia": "lewat 15 menit"},
@@ -626,7 +626,7 @@ for vocab in vocab_list:
         f"""
         <div style="margin-bottom:15px;">
             <!-- Tombol TTS -->
-            <button onclick="speakWord('{safe_word}')">🔊 Pronounce</button>
+            <button onclick="speakWord('{en_word}')">🔊 Pronounce</button>
             
             <!-- Tombol STT -->
             <button onclick="startRecognition('{safe_word}')">🎙️ Test Speaking</button>
